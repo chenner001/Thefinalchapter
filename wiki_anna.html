@@ -1,0 +1,177 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宫崎安奈 - 光文社百科</title>
+    <style>
+        /* ================= 基础Wiki排版 ================= */
+        body {
+            font-family: sans-serif;
+            background-color: #f6f6f6;
+            margin: 0;
+            padding: 0;
+            color: #202122;
+            line-height: 1.6;
+        }
+        
+        .header {
+            background-color: #ffffff;
+            border-bottom: 1px solid #a2a9b1;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+        }
+        .header-logo {
+            font-size: 20px;
+            font-weight: bold;
+            font-family: serif;
+            letter-spacing: 2px;
+            color: #000;
+        }
+        .header-logo span { color: #3366cc; }
+
+        .container {
+            max-width: 1000px;
+            margin: 20px auto;
+            background: #ffffff;
+            border: 1px solid #a2a9b1;
+            padding: 30px 40px;
+        }
+
+        h1 { font-family: serif; border-bottom: 1px solid #a2a9b1; padding-bottom: 5px; font-weight: normal; margin-top: 0; }
+        h2 { font-family: serif; border-bottom: 1px solid #a2a9b1; padding-bottom: 5px; font-weight: normal; margin-top: 30px; }
+        
+        a { color: #0645ad; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* ================= 页面警告框 ================= */
+        .warning-box {
+            background-color: #fbfbfb;
+            border: 1px solid #a2a9b1;
+            border-left: 5px solid #f28b00;
+            padding: 10px 15px;
+            margin-bottom: 20px;
+            font-size: 13px;
+            display: flex;
+            align-items: center;
+        }
+        .warning-box span { margin-left: 10px; }
+
+        /* ================= 右侧信息卡 (Infobox) ================= */
+        .infobox {
+            float: right;
+            clear: right;
+            width: 250px;
+            border: 1px solid #a2a9b1;
+            background-color: #f8f9fa;
+            margin: 0 0 15px 20px;
+            padding: 10px;
+            font-size: 13px;
+        }
+        .infobox-title {
+            text-align: center;
+            font-weight: bold;
+            font-size: 16px;
+            background: #e0e0e0;
+            padding: 5px;
+            margin-bottom: 10px;
+        }
+        .infobox table { width: 100%; border-collapse: collapse; }
+        .infobox th { text-align: left; vertical-align: top; width: 35%; padding: 4px 0; color: #54595d; }
+        .infobox td { padding: 4px 0; }
+
+        /* ================= 玩家推理高亮特效 ================= */
+        .clue-highlight {
+            background-color: #ffe6e6;
+            border-bottom: 2px dashed #ff3f34;
+            cursor: help;
+            position: relative;
+            font-weight: bold;
+            color: #d63031;
+            transition: all 0.3s ease;
+        }
+        .clue-highlight:hover { background-color: #ffcccc; }
+        
+        /* 浮动推理批注 */
+        .clue-tooltip {
+            visibility: hidden;
+            width: 280px;
+            background-color: #2d3436;
+            color: #fff;
+            text-align: left;
+            padding: 12px;
+            border-radius: 6px;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            margin-left: -140px;
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 13px;
+            font-family: "Courier New", Courier, monospace;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            border-left: 4px solid #ff7675;
+        }
+        .clue-tooltip::after {
+            content: "";
+            position: absolute;
+            top: 100%;
+            left: 50%;
+            margin-left: -5px;
+            border-width: 5px;
+            border-style: solid;
+            border-color: #2d3436 transparent transparent transparent;
+        }
+        .clue-highlight:hover .clue-tooltip {
+            visibility: visible;
+            opacity: 1;
+        }
+        .note-title { color: #ff7675; font-weight: bold; margin-bottom: 5px; display: block; border-bottom: 1px solid #555; padding-bottom: 3px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="header">
+        <div class="header-logo">光文社<span>百科</span></div>
+        <div style="margin-left: 30px; font-size: 14px; color: #555;">自由的文学档案库</div>
+    </div>
+
+    <div class="container">
+        <h1>宫崎安奈</h1>
+
+        <div class="warning-box">
+            ⚠️ <span><b>此条目的中立性存在争议。</b> 本页面的部分内容可能包含未经验证的传闻（参见：<a href="#">讨论页</a>），请协助添加可靠来源以改善这篇条目。</span>
+        </div>
+
+        <div class="infobox">
+            <div class="infobox-title">宫崎安奈<br><span style="font-size:12px; font-weight:normal;">Miyazaki Anna</span></div>
+            <table>
+                <tr><th>出生年代</th><td>1975年 (51岁)</td></tr>
+                <tr><th>职业</th><td>前编辑 / 现状不明</td></tr>
+                <tr><th>活跃时期</th><td>1998年 - 2007年</td></tr>
+                <tr><th>知名项目</th><td>《暗夜杀机》等</td></tr>
+                <tr><th>前雇主</th><td><a href="#">光文社</a> (文学编纂部)</td></tr>
+            </table>
+        </div>
+
+        <p><b>宫崎安奈</b>（1975年－ ），前日本出版界知名人士，曾担任光文社文学部首席文学编辑。在业界以极其敏锐的商业嗅觉与文学鉴赏力著称。她曾一手发掘并捧红了包括国民级悬疑小说家<a href="#">黑川龙</a>在内的多位畅销书作家，被媒体誉为“制造畅销书的魔术手”。</p>
+
+        <p>在事业达到顶峰的2007年3月，宫崎突然无故辞职，并彻底退出出版界，此后长达十九年间去向成谜。</p>
+
+        <h2>早期经历与职业巅峰</h2>
+        <p>宫崎于1998年加入光文社。2005年，她担任了黑川龙代表作《暗夜杀机》的责任编辑。在该书的创作过程中，宫崎不仅处理日常编辑事务，还深入参与了核心诡计的架构讨论。该书出版后销量突破三百万册，一举奠定了黑川龙的文豪地位，宫崎安奈也凭此成绩破格晋升为首席文学编辑。</p>
+
+        <h2>骤然隐退与争议</h2>
+        <p>2007年春季，光文社内部正准备为宫崎安奈成立独立的文学工作室。然而，宫崎却在没有任何预兆的情况下提交了辞呈，并拒绝了公司高层的所有挽留与媒体采访。</p>
+        <p>关于其突然隐退的原因，坊间众说纷纭。最具争议的传言称，宫崎安奈卷入了某位知名作家的家庭纠纷。据八卦周刊《文春周报》后来的零星报道，有狗仔曾多次拍摄到退出职场的宫崎频繁出入东京的顶级奢华酒店，且生活开销惊人。有匿名人士爆料称，其巨额花销的背后，是来自某位已婚作家的“封口费”或“包养费”。</p>
+
+        <h2>现状</h2>
+        <p>目前，出版界已彻底没有宫崎安奈的任何活动记录。但在一些非公开的工商检索记录中，有与其同名的人士在东京注册了极其隐秘的资产管理与生命护理类企业。</p>
+
+    </div>
+
+</body>
+</html>
