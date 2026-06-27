@@ -1,1 +1,181 @@
-[地下论坛登录页](./序章1.html)
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>序章 · 开端</title>
+    <style>
+        /* ================= 基础重置 ================= */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        html, body {
+            width: 100%;
+            min-height: 100vh;
+            background-color: #0a0a0a;
+            font-family: "Noto Serif SC", "SimSun", "Times New Roman", serif;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
+        }
+
+        /* ================= 序章容器 ================= */
+        .prologue-container {
+            max-width: 720px;
+            width: 100%;
+            background: #fcf8f0;
+            padding: 60px 65px;
+            border-radius: 4px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.8), 0 0 0 1px #4a3f35 inset;
+            transition: box-shadow 0.3s ease;
+        }
+
+        .prologue-container:hover {
+            box-shadow: 0 24px 80px rgba(0, 0, 0, 0.9), 0 0 0 1px #6a5a4a inset;
+        }
+
+        /* ================= 标题 ================= */
+        .prologue-title {
+            font-size: 28px;
+            font-weight: 700;
+            text-align: center;
+            letter-spacing: 12px;
+            color: #1a1410;
+            padding-bottom: 18px;
+            border-bottom: 2px solid #d0c8bc;
+            margin-bottom: 30px;
+            font-family: "Times New Roman", "Noto Serif SC", serif;
+        }
+
+        .prologue-title small {
+            display: block;
+            font-size: 14px;
+            font-weight: 300;
+            letter-spacing: 6px;
+            color: #8a7a6a;
+            margin-top: 6px;
+        }
+
+        /* ================= 正文 ================= */
+        .prologue-body {
+            font-size: 17px;
+            line-height: 2.2;
+            color: #1e1a16;
+            text-align: justify;
+            letter-spacing: 0.5px;
+        }
+
+        .prologue-body p {
+            text-indent: 2em;
+            margin-bottom: 1.2em;
+        }
+
+        .prologue-body p:last-of-type {
+            margin-bottom: 0;
+        }
+
+        /* ================= 点击跳转文字（按钮风格） ================= */
+        .prologue-link {
+            display: block;
+            margin-top: 36px;
+            padding: 16px 0 14px 0;
+            text-align: center;
+            font-size: 16px;
+            font-weight: 600;
+            letter-spacing: 6px;
+            color: #3a2a1a;
+            background: transparent;
+            border-top: 1px solid #d0c8bc;
+            border-bottom: 1px solid #d0c8bc;
+            text-decoration: none;
+            transition: all 0.35s ease;
+            cursor: pointer;
+            font-family: "Times New Roman", "Noto Serif SC", serif;
+        }
+
+        .prologue-link:hover {
+            color: #8a1a1a;
+            border-top-color: #8a1a1a;
+            border-bottom-color: #8a1a1a;
+            background: rgba(138, 26, 26, 0.04);
+            letter-spacing: 8px;
+        }
+
+        .prologue-link:active {
+            transform: scale(0.97);
+        }
+
+        /* 箭头装饰 */
+        .prologue-link .arrow {
+            display: inline-block;
+            transition: transform 0.3s ease;
+            margin-left: 4px;
+        }
+
+        .prologue-link:hover .arrow {
+            transform: translateX(6px);
+        }
+
+        /* ================= 底部极淡提示 ================= */
+        .prologue-footer {
+            margin-top: 28px;
+            text-align: center;
+            font-size: 11px;
+            color: #b0a898;
+            letter-spacing: 3px;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+        }
+
+        /* ================= 响应式 ================= */
+        @media (max-width: 600px) {
+            .prologue-container {
+                padding: 36px 28px;
+            }
+            .prologue-title {
+                font-size: 22px;
+                letter-spacing: 8px;
+            }
+            .prologue-body {
+                font-size: 15px;
+                line-height: 2;
+            }
+            .prologue-link {
+                font-size: 14px;
+                letter-spacing: 4px;
+                padding: 14px 0 12px 0;
+            }
+            .prologue-link:hover {
+                letter-spacing: 6px;
+            }
+        }
+
+        @media (max-width: 400px) {
+            .prologue-container {
+                padding: 24px 16px;
+            }
+            .prologue-title {
+                font-size: 18px;
+                letter-spacing: 4px;
+            }
+            .prologue-body {
+                font-size: 14px;
+                line-height: 1.9;
+            }
+        }
+    </style>
+</head>
+<body>
+
+        <!-- 点击跳转文字 -->
+        <a href="序章1.html" class="prologue-link">
+            进 入 下 一 章
+            <span class="arrow">→</span>
+        </a>
+    </div>
+
+</body>
+</html>
