@@ -1,0 +1,250 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONFIDENTIAL - 资产处置与版权转移委托书 (Draft v2.1)</title>
+    <style>
+        /* ================= 商业律所电子合同风格 ================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #e5e7eb; /* 浅灰色背景 */
+            color: #111827;
+            font-family: "Times New Roman", "Noto Serif CJK SC", "Songti SC", serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+        }
+
+        /* 律所系统UI边框 */
+        .system-wrapper {
+            width: 100%;
+            max-width: 850px;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 律所系统顶部状态栏 */
+        .system-header {
+            background-color: #1f2937;
+            color: #f3f4f6;
+            padding: 12px 20px;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #b91c1c; /* 警示红 */
+        }
+        .status-badge {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        /* 合同纸张主体 */
+        .contract-paper {
+            background-color: #ffffff;
+            padding: 60px 70px;
+            position: relative;
+            flex: 1;
+        }
+
+        /* 水印 */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            color: rgba(0, 0, 0, 0.03);
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 1;
+            font-family: "Arial", sans-serif;
+        }
+
+        /* 合同排版 */
+        .content-layer {
+            position: relative;
+            z-index: 2;
+        }
+
+        .law-firm-logo {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #4b5563;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #111827;
+            padding-bottom: 10px;
+        }
+
+        .contract-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .party-info {
+            margin-bottom: 30px;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .clause-section {
+            margin-bottom: 25px;
+        }
+        .clause-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .clause-text {
+            font-size: 15px;
+            line-height: 1.8;
+            text-align: justify;
+            text-indent: 2em;
+        }
+
+        /* 重点暴露恶行的下划线 */
+        .evil-highlight {
+            border-bottom: 1px dashed #b91c1c;
+            padding-bottom: 1px;
+            font-weight: bold;
+        }
+
+        /* 签字区 */
+        .signature-area {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .sign-box {
+            width: 45%;
+        }
+        .sign-line {
+            border-bottom: 1px solid #111827;
+            height: 40px;
+            margin-top: 10px;
+            position: relative;
+        }
+        .sign-placeholder {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            color: #9ca3af;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        /* 截获系统侧边栏批注 */
+        .intercept-note {
+            background-color: rgba(17, 24, 39, 0.9);
+            color: #34d399;
+            font-family: "Courier New", monospace;
+            padding: 15px;
+            font-size: 12px;
+            border-top: 1px solid #374151;
+        }
+
+        /* 移动端适配 */
+        @media (max-width: 600px) {
+            body { padding: 15px 10px; }
+            .contract-paper { padding: 30px 20px; }
+            .watermark { font-size: 50px; }
+            .contract-title { font-size: 20px; }
+            .clause-text, .party-info { font-size: 14px; }
+            .signature-area { flex-direction: column; gap: 30px; }
+            .sign-box { width: 100%; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="system-wrapper">
+        
+        <!-- 律所系统顶部 -->
+        <div class="system-header">
+            <div>📄 横浜综合律师事务所 - 客户云端法务系统</div>
+            <div class="status-badge">等待最终签署 (PENDING)</div>
+        </div>
+
+        <!-- 合同正文 -->
+        <div class="contract-paper">
+            <div class="watermark">DRAFT ONLY</div>
+            
+            <div class="content-layer">
+                <div class="law-firm-logo">横浜综合律师事务所 (TEITO LAW FIRM)</div>
+                
+                <div class="contract-title">资产到处与版权转移全权委托书<br><span style="font-size: 14px; font-weight: normal; color: #6b7280;">(遗嘱缺失状态下之特别处置协议)</span></div>
+
+                <div class="party-info">
+                    <strong>甲方（法定第一顺位继承人）：</strong>黑川 百合 （以下简称“甲方”）<br>
+                    <strong>乙方（全权委托代理人及受赠方）：</strong>伊藤 健司 （以下简称“乙方”）
+                </div>
+
+                <div class="clause-section">
+                    <div class="clause-title">第一条：关于死者黑川龙全版权之转移</div>
+                    <div class="clause-text">
+                        鉴于死者黑川龙生前未留下有效书面遗嘱，甲方作为其合法配偶及唯一具备完全民事行为能力之继承人，现明确声明：<span class="evil-highlight">鉴于乙方（伊藤健司）在过去十九年中对黑川龙文学创作提供了无可替代的“核心协助”，甲方自愿将黑川龙名下所有已出版作品、未出版草稿（特指遗作《虚妄之冕》）的全部著作财产权、影视改编权及未来产生之所有版税收益，无偿且永久转让予乙方。</span>乙方将作为“黑川文学”之唯一合法继承者进行后续商业开发。
+                    </div>
+                </div>
+
+                <div class="clause-section">
+                    <div class="clause-title">第二条：不动产之快速清算与资金共管</div>
+                    <div class="clause-text">
+                        甲方授权乙方作为独家代理人，全权负责出售位于东京都目黑区之家族宅邸（即案发书房所在地）。<span class="evil-highlight">为规避该处房产因“自杀事件”导致大幅贬值，乙方有权采取一切必要之商业掩饰手段进行快速抛售。</span>所得款项扣除税费后，将汇入甲乙双方共同设立的海外联名账户，用于双方后续之“共同生活与事业发展”。
+                    </div>
+                </div>
+
+                <div class="clause-section">
+                    <div class="clause-title">第三条：关于次女（黑川雪）之法定份额剥夺与安置</div>
+                    <div class="clause-text">
+                        考虑到次女黑川雪（现年18岁）缺乏社会经验及资金管理能力，甲方作为其生母行使监护及财产代管权。<span class="evil-highlight">甲乙双方一致同意，仅从遗产变现总额中提取 5,000,000 日元（伍佰万日元）设立专项教育基金，并于下月强制安排其前往海外（欧洲或南美）留学。</span>除上述金额外，黑川雪自愿放弃对黑川龙剩余一切有形及无形资产之继承主张，且不得向法院申请保留“特留分”。相关放弃声明将由乙方于明日诱导其签署。
+                    </div>
+                </div>
+
+                <!-- 签字区 -->
+                <div class="signature-area">
+                    <div class="sign-box">
+                        <div>甲方 (授权人)：</div>
+                        <div class="sign-line"><span class="sign-placeholder">[待明日发布会后签署]</span></div>
+                    </div>
+                    <div class="sign-box">
+                        <div>乙方 (受托人)：</div>
+                        <div class="sign-line"><span class="sign-placeholder">[待明日发布会后签署]</span></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- 截获系统侧边栏批注 (展示雪的视角) -->
+        <div class="intercept-note">
+            > [SYSTEM TERMINAL] 文件截获成功。<br>
+            > 来源路径：Ito_CloudDrive/Legal_Documents/明日发布会备用文件.pdf<br>
+        </div>
+
+    </div>
+
+</body>
+</html>

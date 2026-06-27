@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Anna M. // Personal Workspace</title>
+    <style>
+        /* ================= 极简博客风格 ================= */
+        body {
+            font-family: "Noto Serif CJK SC", "PMingLiU", "Songti SC", serif;
+            background-color: #f7f7f7;
+            color: #2c3e50;
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+            display: flex;
+            justify-content: center;
+        }
+
+        .blog-container {
+            width: 100%;
+            max-width: 900px;
+            background-color: #ffffff;
+            min-height: 100vh;
+            padding: 60px 80px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.03);
+            box-sizing: border-box;
+            display: flex;
+            flex-direction: column;
+        }
+
+        /* 博客头部 */
+        .blog-header {
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 20px;
+            margin-bottom: 50px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+        }
+        .blog-title-area {
+            display: flex;
+            flex-direction: column;
+        }
+        .blog-title {
+            font-size: 22px;
+            font-weight: normal;
+            letter-spacing: 2px;
+            color: #2c3e50;
+            text-transform: uppercase;
+        }
+        .blog-subtitle {
+            font-size: 13px;
+            color: #95a5a6;
+            margin-top: 5px;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        /* 布局：左侧文章列表，右侧边栏 */
+        .main-content {
+            display: flex;
+            gap: 50px;
+            flex: 1;
+        }
+
+        .post-list {
+            flex: 3;
+        }
+
+        .sidebar {
+            flex: 1;
+            border-left: 1px solid #eaeaea;
+            padding-left: 30px;
+        }
+
+        /* 文章摘要样式 */
+        .post-item {
+            margin-bottom: 50px;
+        }
+        .post-date {
+            font-family: "Courier New", Courier, monospace;
+            font-size: 12px;
+            color: #bdc3c7;
+            margin-bottom: 8px;
+            display: block;
+        }
+        .post-title {
+            font-size: 20px;
+            font-weight: bold;
+            color: #34495e;
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .post-title:hover {
+            color: #7f8c8d;
+        }
+        .post-excerpt {
+            font-size: 14px;
+            color: #7f8c8d;
+            text-align: justify;
+        }
+
+        /* 侧边栏样式 */
+        .widget {
+            margin-bottom: 40px;
+        }
+        .widget-title {
+            font-size: 12px;
+            color: #bdc3c7;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #eaeaea;
+            padding-bottom: 5px;
+        }
+        .widget-content {
+            font-size: 13px;
+            color: #7f8c8d;
+            line-height: 2;
+        }
+
+        /* ================= 重点：后台控制台入口 ================= */
+        .admin-panel {
+            margin-top: auto;
+            padding-top: 30px;
+        }
+        .admin-link {
+            display: block;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 12px;
+            color: #95a5a6;
+            text-decoration: none;
+            padding: 8px 0;
+            transition: all 0.3s;
+        }
+        .admin-link:hover {
+            color: #e74c3c;
+            padding-left: 5px;
+        }
+        .draft-indicator {
+            background-color: #e74c3c;
+            color: white;
+            border-radius: 50%;
+            padding: 0 6px;
+            font-size: 10px;
+            margin-left: 5px;
+            vertical-align: super;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="blog-container">
+        
+        <div class="blog-header">
+            <div class="blog-title-area">
+                <div class="blog-title">Anna M.</div>
+                <div class="blog-subtitle">文字不过是意图的倒影。</div>
+            </div>
+            <div style="font-family: 'Courier New'; font-size: 12px; color: #bdc3c7;">
+                SYS.STATUS: INACTIVE
+            </div>
+        </div>
+
+        <div class="main-content">
+            <!-- 左侧：公开的文章列表 -->
+            <div class="post-list">
+                <div class="post-item">
+                    <span class="post-date">2007-03-18</span>
+                    <div class="post-title">篇章的终结，与长夜的开始</div>
+                    <div class="post-excerpt">
+                        我已经向光文社递交了辞呈。很多人问我为什么要在事业的高峰期离开，我无法给出能够见报的理由。我只能说，有的承诺需要用一生的时间去兑现，这远比书页上的墨迹沉重得多。再见，出版界。
+                    </div>
+                </div>
+
+                <div class="post-item">
+                    <span class="post-date">2005-11-02</span>
+                    <div class="post-title">《暗夜杀机》编纂手记：致敬极致的理性</div>
+                    <div class="post-excerpt">
+                        今天，《暗夜杀机》的最终校对完成了。黑川老师的文字像手术刀一样精准而冷酷，他剖开了人性中最不见光的部分。作为编辑，能参与到这部杰作的诞生中，是我职业生涯的至高荣幸。
+                    </div>
+                </div>
+
+                <div class="post-item">
+                    <span class="post-date">2001-08-14</span>
+                    <div class="post-title">关于悬疑小说中的“伪证”</div>
+                    <div class="post-excerpt">
+                        最高级的诡计，往往不是隐藏证据，而是把真实的证据暴露在阳光下，却通过视角的误导，让所有人得出完全相反的结论。
+                    </div>
+                </div>
+            </div>
+
+            <!-- 右侧：侧边栏与后台入口 -->
+            <div class="sidebar">
+                <div class="widget">
+                    <div class="widget-title">Profile</div>
+                    <div class="widget-content">
+                        Miyazaki Anna<br>
+                        前文学编辑 / 观察者。<br>
+                        "Silence is a text."
+                    </div>
+                </div>
+
+                <div class="widget">
+                    <div class="widget-title">Archive</div>
+                    <div class="widget-content" style="font-family: 'Courier New'; font-size: 12px;">
+                        > 2007 (1)<br>
+                        > 2006 (0)<br>
+                        > 2005 (4)<br>
+                        > 2001 (12)
+                    </div>
+                </div>
+
+                <!-- 隐藏的草稿箱入口 -->
+                <div class="admin-panel">
+                    <div class="widget-title" style="border-color: transparent;">System / Restricted</div>
+                    <a href="#" class="admin-link">> Login</a>
+                    <a href="#" class="admin-link">> Settings</a>
+                    <!-- 点击跳转到之前的草稿页面 -->
+                    <a href="trust_document.html" class="admin-link">
+                        > Backup <span class="draft-indicator">1</span>
+                    </a>
+                </div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

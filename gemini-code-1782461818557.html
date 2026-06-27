@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>全屏火焰燃烧特效</title>
+    <style>
+        /* ================= 基础重置与背景设定 ================= */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* 隐藏滚动条 */
+            background-color: #000000; /* 纯黑背景让火焰更醒目 */
+            /* 添加一个微弱的底部暗红光晕，增加火焰的环境光真实感 */
+            background: radial-gradient(circle at 50% 100%, #1a0000 0%, #000000 60%);
+        }
+
+        canvas {
+            display: block;
+            width: 100%;
+            height: 100%;
+        }
+
+        /* 可选：如果你想在火焰中加入文字，可以取消下面这段代码的注释 */
+        /*
+        .fire-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: rgba(255, 255, 255, 0.8);
+            font-family: "Noto Serif CJK SC", "Times New Roman", serif;
+            font-size: 40px;
+            font-weight: bold;
+            letter-spacing: 10px;
+            pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+        */
+    </style>
+</head>
+<body>
+
+    <!-- 粒子火焰画布 -->
+    <canvas id="fireCanvas"></canvas>
+
+    <!-- 可选文字：如果你需要的话，取消下面这行的注释 -->
+    <!-- <div class="fire-text">一切皆化为灰烬</div> -->
+
+    <script>
+        const canvas = document.getElementById('fireCanvas');
+        const ctx = canvas.getContext('2d');
+
+        // 设置画布尺寸为窗口大小
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = [];
+
+        // ================= 粒子类 (火苗) =================
+        class FireParticle {
+            constructor() {
+                // 粒子初始位置：随机分布在屏幕底部以下一点，使其自然升起
+                this.x = Math.random() * canvas.width;
+                this.y = canvas.height + Math.random() * 50;
+                
+                // 粒子初始大小
+                this.size = Math.random() * 50 + 20; 
+                
+                // 上升速度与水平摇摆速度
+                this.speedX = Math.random() * 2 - 1; // -1 到 1 之间的水平风向
+                this.speedY = Math.random() * -4 - 2; // -2 到 -6 之间的垂直上升速度
+                
+                // 生命周期（控制颜色渐变和透明度）
+                this.life = 1; 
+                this.decay = Math.random() * 0.015 + 0.005; // 衰减速度
+                
+                // 粒子的随机色彩偏移，让火焰颜色更丰富
+                this.hueOffset = Math.random() * 20 - 10;
+            }
+
+            update() {
+                // 模拟火焰的空气动力学：越往上走，受到风的影响越明显，并伴随随机摇摆
+                this.speedX += (Math.random() - 0.5) * 0.2; 
+                this.x += this.speedX;
+                this.y += this.speedY;
+                
+                // 粒子逐渐变小
+                this.size -= 0.3; 
+                if (this.size < 0) this.size = 0;
+                
+                // 燃烧寿命减少
+                this.life -= this.decay;
+            }
+
+            draw() {
+                if (this.size <= 0 || this.life <= 0) return;
+
+                // 核心：使用 'lighter' 混合模式，重叠的颜色会变亮变白，产生真实的高温火焰效果
+                ctx.globalCompositeOperation = 'lighter';
+
+                // 根据生命周期动态计算颜色
+                // 刚出生时(life近1)：黄白色；中期(life近0.5)：橙红色；快消散时(life近0)：暗红色
+                let r = 255;
+                let g = Math.floor(255 * this.life); 
+                let b = Math.floor(100 * Math.pow(this.life, 3)); // 蓝色成分迅速衰减
+                let alpha = this.life;
+
+                // 创建径向渐变，使每个粒子中心实、边缘虚，像一团发光的气体
+                let gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`);
+                gradient.addColorStop(0.4, `rgba(${r}, ${Math.max(0, g - 50)}, 0, ${alpha * 0.6})`);
+                gradient.addColorStop(1, `rgba(${r}, 0, 0, 0)`);
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+        }
+
+        // ================= 动画主循环 =================
+        function animate() {
+            // 清除上一帧的画布内容 (使用略微透明的黑色可以制造出一点残影拖尾效果，但此处直接清空以保证性能和纯粹的火焰质感)
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 每帧补充新的粒子，数值越大火焰越旺盛 (这里设置为屏幕越宽火越旺)
+            let particlesToSpawn = Math.floor(canvas.width / 100);
+            for (let i = 0; i < particlesToSpawn; i++) {
+                particles.push(new FireParticle());
+            }
+
+            // 更新并绘制所有粒子
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                // 移除已经燃烧殆尽的粒子，释放内存
+                if (particles[i].life <= 0 || particles[i].size <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+
+            // 循环调用
+            requestAnimationFrame(animate);
+        }
+
+        // 启动动画
+        animate();
+
+    </script>
+</body>
+</html>

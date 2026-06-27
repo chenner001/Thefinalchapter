@@ -1,0 +1,264 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>文坛泰斗黑川龙离世，爱徒伊藤健司主持追悼会 - 东京文艺报</title>
+    <style>
+        /* ================= 基础重置 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #f4f5f7; /* 模拟白天常规新闻网站的浅色背景 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #333;
+            line-height: 1.6;
+        }
+
+        /* ================= 模拟浏览器顶栏 ================= */
+        .browser-header {
+            background: #e0e0e0;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ccc;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .browser-dots span {
+            display: inline-block;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+        .browser-url {
+            margin-left: 20px;
+            background: #fff;
+            padding: 4px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            flex-grow: 1;
+            max-width: 600px;
+            font-family: monospace;
+        }
+
+        /* ================= 网站导航栏 ================= */
+        .news-nav {
+            background: #1a1a1a;
+            color: #fff;
+            padding: 15px 10vw;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+        .news-logo { font-size: 24px; font-weight: bold; font-family: "Noto Serif SC", serif; letter-spacing: 2px; }
+        .news-links span { margin-left: 20px; font-size: 14px; cursor: pointer; transition: color 0.2s; }
+        .news-links span:hover { color: #cc0000; }
+
+        /* ================= 页面主体布局 ================= */
+        .container {
+            display: flex;
+            max-width: 1100px;
+            margin: 30px auto;
+            padding: 0 20px;
+            gap: 40px;
+        }
+
+        /* 左侧：文章主体 */
+        .article-main {
+            flex: 3;
+            background: #fff;
+            padding: 40px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        
+        /* 文章头部 */
+        .article-title {
+            font-size: 28px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            font-family: "Noto Serif SC", serif;
+            color: #111;
+        }
+        .article-meta {
+            font-size: 13px;
+            color: #888;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+        }
+
+        /* 新闻配图 */
+        .article-figure {
+            margin-bottom: 30px;
+            text-align: center;
+        }
+        .article-figure img {
+            max-width: 100%;
+            height: auto;
+            border: 1px solid #ddd;
+            /* 鼠标悬停时的细微交互：照片变得灰暗，暗示这场追悼会的虚伪 */
+            transition: filter 0.5s ease;
+        }
+        .article-figure img:hover {
+            filter: grayscale(100%) contrast(120%);
+        }
+        .article-figcaption {
+            margin-top: 10px;
+            font-size: 13px;
+            color: #666;
+        }
+
+        /* 文章正文 */
+        .article-content p {
+            margin-bottom: 20px;
+            font-size: 16px;
+            color: #333;
+            text-align: justify;
+        }
+        /* 加粗关键词，引导玩家的视线 */
+        .highlight {
+            font-weight: bold;
+            color: #000;
+        }
+        /* 隐藏的情感线索：伊藤的悼词 */
+        .quote {
+            padding: 15px 20px;
+            background: #f9f9f9;
+            border-left: 4px solid #333;
+            font-style: italic;
+            color: #555;
+            margin-bottom: 20px;
+        }
+
+        /* 右侧：侧边栏 */
+        .sidebar {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 20px;
+        }
+        .sidebar-widget {
+            background: #fff;
+            padding: 20px;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+            border-radius: 4px;
+        }
+        .widget-title {
+            font-size: 16px;
+            font-weight: bold;
+            margin-bottom: 15px;
+            border-bottom: 2px solid #cc0000;
+            padding-bottom: 5px;
+            display: inline-block;
+        }
+        .widget-list { list-style: none; }
+        .widget-list li {
+            font-size: 14px;
+            margin-bottom: 10px;
+            padding-bottom: 10px;
+            border-bottom: 1px dashed #eee;
+        }
+        .widget-list li a { color: #333; text-decoration: none; }
+        .widget-list li a:hover { color: #cc0000; }
+
+        /* 侧边栏广告：巧妙植入第二章的线索伏笔 */
+        .ad-widget {
+            background: #fafafa;
+            border: 1px solid #e0e0e0;
+            text-align: center;
+            padding: 30px 20px;
+        }
+        .ad-label { font-size: 11px; color: #aaa; margin-bottom: 10px; display: block; }
+        .ad-title { font-size: 18px; font-family: "Noto Serif SC", serif; color: #1a1a1a; margin-bottom: 10px; }
+        .ad-desc { font-size: 12px; color: #666; }
+    </style>
+</head>
+<body>
+
+    <!-- 顶层模拟浏览器 UI -->
+    <div class="browser-header">
+        <div class="browser-dots">
+            <span class="dot-red"></span>
+            <span class="dot-yellow"></span>
+            <span class="dot-green"></span>
+        </div>
+        <div class="browser-url">https://news.tokyobungei.co.jp/article/20260623-88492.html</div>
+    </div>
+
+    <!-- 网站导航 -->
+    <div class="news-nav">
+        <div class="news-logo">东京文艺报</div>
+        <div class="news-links">
+            <span>首页</span>
+            <span>快讯</span>
+            <span>深度报道</span>
+            <span>文坛风云</span>
+            <span>专栏评论</span>
+        </div>
+    </div>
+
+    <!-- 页面主体 -->
+    <div class="container">
+        
+        <!-- 左侧文章 -->
+        <div class="article-main">
+            <h1 class="article-title">文坛泰斗黑川龙离世，爱徒伊藤健司主持追悼会</h1>
+            <div class="article-meta">
+                <span>记者：中岛健太 | 报道中心</span>
+                <span>2026年6月23日 15:30 发布</span>
+            </div>
+
+            <!-- 新闻配图 -->
+            <figure class="article-figure">
+                <!-- 相对路径引用图片 -->
+                <img src="追悼会.png" alt="黑川龙追悼会现场">
+                <figcaption class="article-figcaption">图：6月23日上午，伊藤健司（左）与遗孀黑川百合（右）在追悼会现场接待宾客。</figcaption>
+            </figure>
+
+            <div class="article-content">
+                <p><strong>【东京文艺报专稿】</strong> 今日上午，日本文坛巨匠、国家文学最高奖项得主黑川龙的追悼会在东京青山殡仪馆庄严举行。这位曾以《暗夜杀机》开创日本推理新纪元的伟大作家，于本月20日夜间在长野县深山木屋中离世，享年60岁。</p>
+                
+                <p>长野县警方昨日通报了最终调查结果。警方表示，案发木屋的门窗从内部用三道防盗栓死死反锁。死因确认为一氧化碳中毒。结合黑川龙近年来枯竭的创作状态及相关医院记录，警方已排除他杀可能，正式以<span class="highlight">“严重抑郁导致的密室烧炭自杀”</span>结案。</p>
+
+                <p>追悼会现场气氛凝重，包括各大出版社社长、知名评论家在内的近五百名文坛人士前来吊唁，送别这位文学泰斗。黑川龙的遗孀黑川百合女士身着黑衣，神情哀伤，全程在亲友的搀扶下向来宾致意。而作为本次追悼会的核心组织者，<span class="highlight">黑川老师生前最器重的爱徒——青年作家伊藤健司</span>，则强忍悲痛主持了全场仪式。</p>
+
+                <div class="quote">
+                    “黑川老师是我一生的恩师。这十年来，我一直在他身边，眼看着他因为创作瓶颈承受着常人难以想象的心理折磨。”伊藤健司在致悼词时几度哽咽，“老师虽然离开了，但他的文学精神永存。我会继承他的遗志，代他守护这个文坛，绝不让他的心血付诸东流。”
+                </div>
+
+                <p>据光文社高层（匿名）透露，黑川龙原本计划于下个月召开新书发布会，未曾想这一盛会竟成了永远无法兑现的遗憾。业界纷纷表示，黑川老师的离去，标志着日本文学界一个辉煌时代的落幕。</p>
+            </div>
+        </div>
+
+        <!-- 右侧侧边栏 -->
+        <div class="sidebar">
+            <div class="sidebar-widget">
+                <h3 class="widget-title">相关报道</h3>
+                <ul class="widget-list">
+                    <li><a href="#">回顾黑川龙一生：从寂寂无名到直木奖神坛</a></li>
+                    <li><a href="#">长野县警方披露密室细节：完美得令人窒息</a></li>
+                    <li><a href="#">光文社股票暴跌，新书断档引发出版界地震</a></li>
+                    <li><a href="#">伊藤健司或将接手黑川遗稿整理工作</a></li>
+                </ul>
+            </div>
+
+            <!-- 巧妙植入的第二章线索伏笔（母亲的花店） -->
+            <div class="sidebar-widget ad-widget">
+                <span class="ad-label">- 赞助商链接 -</span>
+                <div class="ad-title">花艺定制</div>
+                <div class="ad-desc">高级白事/追悼会花艺陈设。<br>承接本次黑川龙追悼会全场白菊定制。</div>
+            </div>
+        </div>
+
+    </div>
+
+</body>
+</html>

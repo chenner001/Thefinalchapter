@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CONFIDENTIAL - 资产处置与版权转移委托书 (Draft v2.1)</title>
+    <style>
+        /* ================= 商业律所电子合同风格 ================= */
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            background-color: #e5e7eb; 
+            color: #111827;
+            font-family: "Times New Roman", "Noto Serif CJK SC", "Songti SC", serif;
+            display: flex;
+            justify-content: center;
+            padding: 40px 20px;
+            min-height: 100vh;
+            position: relative;
+        }
+
+        /* 律所系统UI边框 */
+        .system-wrapper {
+            width: 100%;
+            max-width: 850px;
+            background-color: #f9fafb;
+            border: 1px solid #d1d5db;
+            border-radius: 8px;
+            box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            transition: filter 0.4s ease; /* 平滑的高斯模糊过渡 */
+            position: relative;
+            z-index: 10;
+        }
+
+        /* 律所系统顶部状态栏 */
+        .system-header {
+            background-color: #1f2937;
+            color: #f3f4f6;
+            padding: 12px 20px;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-size: 13px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 3px solid #b91c1c; 
+        }
+        .status-badge {
+            background-color: #fef08a;
+            color: #854d0e;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: bold;
+            font-size: 11px;
+            text-transform: uppercase;
+        }
+
+        /* 合同纸张主体 */
+        .contract-paper {
+            background-color: #ffffff;
+            padding: 60px 70px;
+            position: relative;
+            flex: 1;
+        }
+
+        /* 水印 */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-30deg);
+            font-size: 80px;
+            color: rgba(0, 0, 0, 0.03);
+            font-weight: bold;
+            white-space: nowrap;
+            pointer-events: none;
+            z-index: 1;
+            font-family: "Arial", sans-serif;
+        }
+
+        /* 合同排版 */
+        .content-layer {
+            position: relative;
+            z-index: 2;
+        }
+
+        .law-firm-logo {
+            text-align: center;
+            font-size: 18px;
+            font-weight: bold;
+            color: #4b5563;
+            margin-bottom: 40px;
+            letter-spacing: 2px;
+            border-bottom: 2px solid #111827;
+            padding-bottom: 10px;
+        }
+
+        .contract-title {
+            text-align: center;
+            font-size: 24px;
+            font-weight: bold;
+            margin-bottom: 30px;
+        }
+
+        .party-info {
+            margin-bottom: 30px;
+            font-size: 15px;
+            line-height: 1.8;
+        }
+
+        .clause-section {
+            margin-bottom: 25px;
+        }
+        .clause-title {
+            font-weight: bold;
+            font-size: 16px;
+            margin-bottom: 10px;
+        }
+        .clause-text {
+            font-size: 15px;
+            line-height: 1.8;
+            text-align: justify;
+            text-indent: 2em;
+        }
+
+        /* 重点暴露恶行的下划线 */
+        .evil-highlight {
+            border-bottom: 1px dashed #b91c1c;
+            padding-bottom: 1px;
+            font-weight: bold;
+        }
+
+        /* 触发互动的文本高亮变色 */
+        .trigger-phrase {
+            cursor: help;
+            transition: color 0.3s ease, background-color 0.3s ease;
+        }
+        .trigger-phrase:hover {
+            color: #b91c1c;
+            background-color: rgba(185, 28, 28, 0.05);
+        }
+
+        /* 签字区 */
+        .signature-area {
+            margin-top: 60px;
+            display: flex;
+            justify-content: space-between;
+        }
+        .sign-box {
+            width: 45%;
+        }
+        .sign-line {
+            border-bottom: 1px solid #111827;
+            height: 40px;
+            margin-top: 10px;
+            position: relative;
+        }
+        .sign-placeholder {
+            position: absolute;
+            bottom: 5px;
+            left: 0;
+            color: #9ca3af;
+            font-family: "Helvetica Neue", Arial, sans-serif;
+            font-style: italic;
+            font-size: 14px;
+        }
+
+        /* 截获系统侧边栏批注 */
+        .intercept-note {
+            background-color: rgba(17, 24, 39, 0.9);
+            color: #34d399;
+            font-family: "Courier New", monospace;
+            padding: 15px;
+            font-size: 12px;
+            border-top: 1px solid #374151;
+        }
+
+        /* ================= 全屏黑色内心独白浮层 ================= */
+        .rage-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 10000;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            opacity: 0;
+            pointer-events: none;
+            backdrop-filter: blur(0px); 
+            transition: opacity 0.4s ease;
+        }
+
+        .rage-text {
+            color: #7a0000;
+            font-family: "SimSun", "STSong", "Noto Serif CJK SC", serif;
+            font-size: 28px; 
+            font-weight: 900;
+            font-style: italic;
+            line-height: 2;
+            text-align: center;
+            max-width: 850px;
+            padding: 0 30px;
+            letter-spacing: 4px;
+            text-shadow: 
+                2px 2px 0px #000000,
+                -1px -1px 0px rgba(255, 0, 0, 0.4),
+                0 0 15px rgba(185, 0, 0, 0.8),
+                0 0 35px rgba(100, 0, 0, 0.9);
+            transform: scale(0.9) translateY(20px);
+            transition: transform 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275); 
+        }
+
+        /* 激活状态 */
+        body.rage-active .system-wrapper { filter: blur(8px); }
+        body.rage-active .rage-overlay { opacity: 1; }
+        body.rage-active .rage-text { transform: scale(1) translateY(0); }
+
+        /* ================= 点击热区 (定位在合同内) ================= */
+        .spark-hotspot {
+            position: absolute;
+            bottom: 10px;
+            right: 10px;
+            width: 100px;
+            height: 100px;
+            z-index: 30;
+            display: none; /* 初始隐藏 */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" style="font-size:24px"><text y="22">🔥</text></svg>'), pointer;
+        }
+
+        /* ================= Canvas 火星层 ================= */
+        #fireCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            z-index: 20000; /* 确保在所有图层之上 */
+            pointer-events: none; /* 穿透点击，不影响底下合同 */
+        }
+    </style>
+</head>
+<body>
+
+    <div class="system-wrapper">
+        <div class="system-header">
+            <div>📄 横浜综合律师事务所 - 客户云端法务系统</div>
+            <div class="status-badge">等待最终签署 (PENDING)</div>
+        </div>
+
+        <div class="contract-paper" id="paper">
+            <div class="watermark">DRAFT ONLY</div>
+            
+            <div class="content-layer">
+                <div class="law-firm-logo">横浜综合律师事务所 (TEITO LAW FIRM)</div>
+                <div class="contract-title">资产到处与版权转移全权委托书<br><span style="font-size: 14px; font-weight: normal; color: #6b7280;">(遗嘱缺失状态下之特别处置协议)</span></div>
+
+                <div class="party-info">
+                    <strong>甲方（法定第一顺位继承人）：</strong>黑川 百合 （以下简称“甲方”）<br>
+                    <strong>乙方（全权委托代理人及受赠方）：</strong>伊藤 健司 （以下简称“乙方”）
+                </div>
+
+                <div class="clause-section">
+                    <div class="clause-title">第一条：关于死者黑川龙全版权之转移</div>
+                    <div class="clause-text">
+                        鉴于死者黑川龙生前未留下有效书面遗嘱，甲方作为其合法配偶及唯一具备完全民事行为能力之继承人，现明确声明：<span class="evil-highlight">鉴于乙方（伊藤健司）在过去十九年中对黑川龙文学创作提供了无可替代的“核心协助”，甲方自愿将黑川龙名下所有已出版作品、未出版草稿（特指遗作《虚妄之冕》）的全部著作财产权、影视改编权及未来产生之所有版税收益，无偿且永久转让予乙方。</span>乙方将作为“黑川文学”之唯一合法继承者进行后续商业开发。
+                    </div>
+                </div>
+
+                <div class="clause-section">
+                    <div class="clause-title">第二条：不动产之快速清算与资金共管</div>
+                    <div class="clause-text">
+                        甲方授权乙方作为独家代理人，全权负责出售位于东京都目黑区之家族宅邸（即案发书房所在地）。<span class="evil-highlight">为规避该处房产因“自杀事件”导致大幅贬值，乙方有权采取一切必要之商业掩饰手段进行快速抛售。</span>所得款项扣除税费后，将汇入甲乙双方共同设立的海外联名账户，用于双方后续之“共同生活与事业发展”。
+                    </div>
+                </div>
+
+                <div class="clause-section">
+                    <div class="clause-title">第三条：关于次女（黑川雪）之法定份额剥夺与安置</div>
+                    <div class="clause-text">
+                        考虑到次女黑川雪（现年18岁）缺乏社会经验及资金管理能力，甲方作为其生母行使监护及财产代管权。<!-- 触发交互的文本 --><span class="evil-highlight trigger-phrase" id="triggerPhrase">甲乙双方一致同意，仅从遗产变现总额中提取 5,000,000 日元（伍佰万日元）设立专项教育基金，并于下月强制安排其前往海外（欧洲或南美）留学。</span>除上述金额外，黑川雪自愿放弃对黑川龙剩余一切有形及无形资产之继承主张，且不得向法院申请保留“特留分”。相关放弃声明将由乙方于明日诱导其签署。
+                    </div>
+                </div>
+
+                <div class="signature-area">
+                    <div class="sign-box"><div>甲方 (授权人)：</div><div class="sign-line"><span class="sign-placeholder">[待明日发布会后签署]</span></div></div>
+                    <div class="sign-box"><div>乙方 (受托人)：</div><div class="sign-line"><span class="sign-placeholder">[待明日发布会后签署]</span></div></div>
+                </div>
+            </div>
+
+            <!-- 点击触发全屏火星的热区，定位在纸张内右下角 -->
+            <div id="sparkHotspot" class="spark-hotspot" title="燃尽谎言"></div>
+        </div>
+
+        <div class="intercept-note">
+            > [SYSTEM TERMINAL] 文件截获成功。<br>
+            > 来源路径：Ito_CloudDrive/Legal_Documents/明日发布会备用文件.pdf<br>
+        </div>
+    </div>
+
+    <!-- 全屏内心独白浮层 -->
+    <div class="rage-overlay">
+        <div class="rage-text">
+            伍佰万日元？这就是我亲生母亲给我标的价码。<br>
+            明天，我会把这几页纸，连同你们的下半辈子，一起烧成灰。
+        </div>
+    </div>
+
+    <!-- 全屏火星粒子画布置于最外层 -->
+    <canvas id="fireCanvas"></canvas>
+
+    <script>
+        const trigger = document.getElementById('triggerPhrase');
+        const body = document.body;
+        const paper = document.getElementById('paper');
+        const hotspot = document.getElementById('sparkHotspot');
+        
+        // Canvas 变量
+        const canvas = document.getElementById('fireCanvas');
+        const ctx = canvas.getContext('2d');
+        let particles = [];
+        let sparkMode = 'none'; // 'none' -> 'local' -> 'fullscreen'
+        let monologueSeen = false;
+
+        // 设置 Canvas 尺寸
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        // 1. 鼠标移入文字：触发黑化浮现
+        trigger.addEventListener('mouseenter', () => {
+            if (sparkMode === 'fullscreen') return;
+            body.classList.add('rage-active');
+            monologueSeen = true;
+        });
+
+        // 2. 鼠标移开文字：浮现退去，在文件右下角出现火星
+        trigger.addEventListener('mouseleave', () => {
+            body.classList.remove('rage-active');
+            
+            // 如果看过独白，且还未触发火星，则进入 local 模式
+            if (monologueSeen && sparkMode === 'none') {
+                sparkMode = 'local';
+                hotspot.style.display = 'block'; // 激活热区
+                animateSparks(); // 启动粒子引擎
+            }
+        });
+
+        // 3. 鼠标点击右下角火星：全屏爆发，3秒后跳转
+        hotspot.addEventListener('click', () => {
+            if (sparkMode === 'local') {
+                sparkMode = 'fullscreen';
+                hotspot.style.display = 'none'; // 隐藏热区
+                
+                // 倒计时 3 秒跳转
+                setTimeout(() => {
+                    window.location.href = 'fire.html';
+                }, 3000);
+            }
+        });
+
+        // ================= 微小火星粒子类 =================
+        class Spark {
+            constructor() {
+                if (sparkMode === 'local') {
+                    // 获取纸张元素的实时位置坐标
+                    const rect = paper.getBoundingClientRect();
+                    // 在纸张的右下角局部生成，并带有轻微的范围随机偏移
+                    this.x = rect.right - 50 + (Math.random() - 0.5) * 40;
+                    this.y = rect.bottom - 40 + (Math.random() - 0.5) * 30;
+                    
+                    // 局部火星运动幅度较小，偏向左上方飘散
+                    this.vx = (Math.random() - 0.8) * 1.5; 
+                    this.vy = (Math.random() - 1) * 2;
+                } else {
+                    // 全屏模式下，从整个屏幕下方随机涌出
+                    this.x = Math.random() * canvas.width;
+                    this.y = canvas.height + 10;
+                    
+                    // 全屏火星升腾速度更快
+                    this.vx = (Math.random() - 0.5) * 3;
+                    this.vy = (Math.random() - 1) * 6 - 1;
+                }
+                
+                // 粒子的尺寸极其微小 (0.5 到 2 像素)
+                this.size = Math.random() * 1.5 + 0.5;
+                // 粒子寿命
+                this.life = Math.random() * 0.8 + 0.4;
+                this.maxLife = this.life;
+                
+                // 颜色以极其明亮的火星颜色为主：白、亮黄、亮橙红
+                const colors = ['#ffffff', '#ffea00', '#ff8800', '#ff3300'];
+                this.color = colors[Math.floor(Math.random() * colors.length)];
+            }
+
+            update() {
+                this.x += this.vx;
+                this.y += this.vy;
+                
+                // 加速上升（模拟热力）
+                this.vy -= 0.03;
+                // 增加空气乱流的随机横向闪烁抖动
+                this.vx += (Math.random() - 0.5) * 0.8;
+                
+                // 衰减生命值
+                this.life -= 0.012;
+            }
+
+            draw() {
+                if (this.life <= 0) return;
+                ctx.globalAlpha = Math.max(0, this.life / this.maxLife);
+                ctx.fillStyle = this.color;
+                
+                // 微弱的光晕，不再喧宾夺主
+                ctx.shadowBlur = 4;
+                ctx.shadowColor = this.color;
+                
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fill();
+                
+                ctx.globalAlpha = 1;
+                ctx.shadowBlur = 0;
+            }
+        }
+
+        // ================= 动画循环 =================
+        function animateSparks() {
+            if (sparkMode === 'none') return;
+            
+            // 每帧清理画布，不要拖尾以保持火星的锐利
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            // 生成新粒子的速率控制
+            let spawnCount = (sparkMode === 'fullscreen') ? 15 : 2;
+            for (let i = 0; i < spawnCount; i++) {
+                particles.push(new Spark());
+            }
+
+            // 更新并绘制现有粒子
+            for (let i = particles.length - 1; i >= 0; i--) {
+                let p = particles[i];
+                p.update();
+                p.draw();
+                
+                // 清除消亡粒子
+                if (p.life <= 0) {
+                    particles.splice(i, 1);
+                }
+            }
+            
+            requestAnimationFrame(animateSparks);
+        }
+    </script>
+</body>
+</html>
