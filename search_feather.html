@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>无名之羽 - Search Engine</title>
+    <style>
+        /* ================= 基础重置与桌面背景 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* ================= macOS 浏览器视窗 ================= */
+        .mac-window {
+            width: 85%;
+            max-width: 1100px;
+            height: 80vh;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: windowPopUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes windowPopUp {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* 顶部控制栏 (Title Bar) */
+        .title-bar {
+            height: 52px;
+            background-color: #f5f5f7;
+            border-bottom: 1px solid #d1d1d6;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* 红黄绿红绿灯按钮 */
+        .traffic-lights {
+            display: flex;
+            gap: 8px;
+            width: 60px;
+        }
+        .traffic-lights span {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .close { background-color: #ff5f56; border: 1px solid #e0443e; }
+        .minimize { background-color: #ffbd2e; border: 1px solid #dea123; }
+        .maximize { background-color: #27c93f; border: 1px solid #1aab29; }
+
+        /* 浏览器地址栏 */
+        .url-bar {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            left: 0; right: 0;
+            pointer-events: none;
+        }
+        .url-input {
+            width: 40%;
+            min-width: 300px;
+            height: 28px;
+            background-color: #e3e3e5;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1d1d1f;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        .url-input span { opacity: 0.5; margin-right: 5px; }
+
+        /* ================= 搜索结果页面布局 ================= */
+        .browser-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            overflow-y: auto; /* 允许内部滚动 */
+        }
+
+        /* 搜索顶部：Logo与搜索框 */
+        .search-header {
+            display: flex;
+            align-items: center;
+            padding: 25px 30px 15px 30px;
+            border-bottom: 1px solid #ebebeb;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+
+        .mini-logo {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-right: 30px;
+            user-select: none;
+        }
+        .mini-logo span:nth-child(1) { color: #4285F4; }
+        .mini-logo span:nth-child(2) { color: #EA4335; }
+        .mini-logo span:nth-child(3) { color: #FBBC05; }
+        .mini-logo span:nth-child(4) { color: #4285F4; }
+        .mini-logo span:nth-child(5) { color: #34A853; }
+        .mini-logo span:nth-child(6) { color: #EA4335; }
+
+        .mini-search-box {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 650px;
+            height: 44px;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            padding: 0 20px;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .mini-search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #202124;
+            padding-left: 10px;
+        }
+        .clear-icon { color: #70757a; font-size: 18px; cursor: pointer; padding-right: 15px; border-right: 1px solid #dfe1e5;}
+        .search-icon { color: #4285F4; font-size: 18px; cursor: pointer; padding-left: 15px; font-weight: bold;}
+
+        /* 搜索类型 Tab */
+        .search-tabs {
+            display: flex;
+            padding: 0 160px;
+            border-bottom: 1px solid #ebebeb;
+            color: #5f6368;
+            font-size: 14px;
+        }
+        .search-tabs div {
+            padding: 12px 16px;
+            cursor: pointer;
+        }
+        .search-tabs .active {
+            color: #1a73e8;
+            border-bottom: 3px solid #1a73e8;
+        }
+
+        /* 搜索结果列表 */
+        .results-container {
+            padding: 30px 160px;
+            max-width: 900px;
+        }
+
+        .result-info {
+            color: #70757a;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .result-item {
+            margin-bottom: 35px;
+            line-height: 1.5;
+        }
+
+        .result-url {
+            font-size: 14px;
+            color: #202124;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .result-url span { color: #4d5156; margin: 0 5px; font-size: 12px; }
+
+        .result-title {
+            font-size: 20px;
+            color: #1a0dab;
+            text-decoration: none;
+            font-weight: 400;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+        .result-title:hover {
+            text-decoration: underline;
+        }
+
+        .result-desc {
+            font-size: 14px;
+            color: #4d5156;
+            max-width: 650px;
+            word-wrap: break-word;
+        }
+        .result-desc strong {
+            color: #202124;
+        }
+
+        /* 加密结果特有的代码块样式 */
+        .encrypted-desc {
+            font-family: monospace;
+            background-color: #f1f3f4;
+            padding: 4px 8px;
+            border-radius: 4px;
+            color: #d93025;
+            font-size: 12px;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bdc1c6; }
+    </style>
+</head>
+<body>
+
+    <div class="mac-window">
+        <!-- Safari 风格顶部栏 -->
+        <div class="title-bar">
+            <div class="traffic-lights">
+                <span class="close"></span>
+                <span class="minimize"></span>
+                <span class="maximize"></span>
+            </div>
+            <div class="url-bar">
+                <div class="url-input">
+                    <span>🔒</span> www.search-engine.com/search?q=无名之羽
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索引擎主体 -->
+        <div class="browser-content">
+            
+            <!-- 搜索头 -->
+            <div class="search-header">
+                <div class="mini-logo">
+                    <span>S</span><span>e</span><span>a</span><span>r</span><span>c</span><span>h</span>
+                </div>
+                <div class="mini-search-box">
+                    <input type="text" value="无名之羽">
+                    <div class="clear-icon">×</div>
+                    <div class="search-icon">🔍</div>
+                </div>
+            </div>
+
+            <!-- 搜索分类 -->
+            <div class="search-tabs">
+                <div class="active">全部</div>
+                <div>图片</div>
+                <div>新闻</div>
+                <div>学术</div>
+            </div>
+
+            <!-- 搜索结果列表 -->
+            <div class="results-container">
+                <!-- 结果数量明显偏少，体现出词汇的生僻与隐秘 -->
+                <div class="result-info">找到约 1,240 条结果 （用时 0.17 秒）</div>
+
+                <!-- 核心线索：日记登录页面 (加密状态) -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://space.fc2.com <span>></span> hidden <span>></span> login
+                    </div>
+                    <!-- 跳转到 rijidenglu.html，新标签页打开 -->
+                    <a href="rijidenglu.html" target="_blank" class="result-title">【系统提示】无名之羽 - 私人手记登录页</a>
+                    <div class="result-desc">
+                        <span class="encrypted-desc">ACCESS_DENIED: 403 FORBIDDEN</span><br>
+                        此页面属于私人加密空间，暂不对未授权访问者开放。提示：该站点已被搜索引擎机器人意外抓取……
+                    </div>
+                </div>
+
+                <!-- 虚构干扰项1：维基词条解释 (暗示文学隐喻) -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://ja.wiktionary.org <span>></span> wiki <span>></span> 无名之羽
+                    </div>
+                    <a href="#" class="result-title">无名之羽 - 维基词典，自由的多语言词典</a>
+                    <div class="result-desc">
+                        <strong>无名之羽</strong>（むめいのはね），现代文学中的冷门意象。通常用来指代那些没有归属、随风飘荡，或是被拔去姓名与身份的弱小存在。在某些诗歌流派中，也被用来比喻被窃取了灵感创作者的悲鸣……
+                    </div>
+                </div>
+
+                <!-- 虚构干扰项2：过期的匿名论坛讨论 -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://archived.2ch-forum.jp <span>></span> thread <span>></span> 39921
+                    </div>
+                    <a href="#" class="result-title">求助：有人记得十年前那个叫“无名之羽”的地下暗网博客吗？</a>
+                    <div class="result-desc">
+                        如题。以前无意中点进去过一个全黑背景的博客，博主代号好像就叫<strong>无名之羽</strong>。里面全是一些很压抑的心情记录和不知名的手稿残卷。现在想找找不到了，网址是不是被注销了？
+                    </div>
+                </div>
+                
+                <!-- 虚构干扰项3：游戏道具 -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://wiki.fantasy-rpg.jp <span>></span> items <span>></span> feather
+                    </div>
+                    <a href="#" class="result-title">无名之羽 (任务道具) - 幻想异界 Wiki</a>
+                    <div class="result-desc">
+                        获取途径：击败哀叹峡谷的隐藏Boss后掉落。物品描述：“一根沾染了灰烬的<strong>无名之羽</strong>，传说中可以用来解开被封印的遗言，需配合真实的眼泪方可使用。”
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>寂静的书房</title>
+    <style>
+        /* ================= 基础设定：压抑的深夜氛围 ================= */
+        body {
+            margin: 0;
+            padding: 40px 20px;
+            background-color: #0a0a0a;
+            color: #d1d5db;
+            font-family: "Noto Serif CJK SC", "Songti SC", "Times New Roman", serif;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            min-height: 100vh;
+        }
+
+        .header-title {
+            font-size: 16px;
+            letter-spacing: 2px;
+            margin-bottom: 30px;
+            color: #9ca3af;
+            text-align: center;
+            line-height: 1.8;
+            font-style: italic;
+        }
+
+        /* ================= 场景容器 ================= */
+        .scene-container {
+            position: relative;
+            width: 100%;
+            max-width: 1000px;
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.9);
+            border: 1px solid #1f2937;
+        }
+
+        .scene-image {
+            width: 100%;
+            height: auto;
+            display: block;
+            filter: brightness(0.85) contrast(1.1);
+        }
+
+        /* ================= 隐藏的交互热区 ================= */
+        .hotspot {
+            position: absolute;
+            cursor: pointer;
+            z-index: 10;
+        }
+
+        /* 轮椅热区坐标 */
+        .hotspot-wheelchair {
+            top: 25%;
+            left: 5%;
+            width: 45%;
+            height: 65%;
+        }
+
+        /* 电脑热区坐标 */
+        .hotspot-computer {
+            top: 32%;
+            left: 57%;
+            width: 18%;
+            height: 18%;
+        }
+
+        /* 钟表热区坐标 (隐秘录音装置) */
+        .hotspot-clock {
+            top: 18%;
+            left: 32%;
+            width: 8%;
+            height: 6%;
+        }
+
+        /* ================= 弹窗基础遮罩 ================= */
+        .modal-overlay {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-color: rgba(0, 0, 0, 0.85);
+            z-index: 100;
+            justify-content: center;
+            align-items: center;
+            backdrop-filter: blur(4px);
+        }
+
+        /* ================= 内心独白弹窗样式 (轮椅 & 提示) ================= */
+        .modal-box {
+            background-color: #111827;
+            color: #e5e7eb;
+            width: 90%;
+            max-width: 550px;
+            padding: 40px;
+            border-left: 4px solid #6b7280;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            position: relative;
+        }
+
+        .modal-title {
+            font-size: 14px;
+            color: #9ca3af;
+            margin-top: 0;
+            margin-bottom: 20px;
+            letter-spacing: 1px;
+            border-bottom: 1px solid #374151;
+            padding-bottom: 10px;
+        }
+
+        .modal-text {
+            font-size: 15px;
+            line-height: 2;
+            margin-bottom: 30px;
+            text-align: justify;
+        }
+
+        /* ================= 终端录音弹窗样式 (钟表) ================= */
+        .terminal-box {
+            background-color: #050505;
+            color: #34d399; /* 终端绿 */
+            width: 95%;
+            max-width: 700px;
+            max-height: 85vh;
+            padding: 30px;
+            border: 1px solid #10b981;
+            box-shadow: 0 0 30px rgba(16, 185, 129, 0.2);
+            font-family: "Courier New", Courier, monospace;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        .terminal-content {
+            font-size: 13px;
+            line-height: 1.6;
+            white-space: pre-wrap;
+            text-shadow: 0 0 2px rgba(52, 211, 153, 0.5);
+        }
+
+        .speaker-a { color: #f87171; } /* 伊藤：红色 */
+        .speaker-b { color: #93c5fd; } /* 黑川龙：蓝色 */
+        .sys-warn { color: #fbbf24; font-weight: bold; } /* 系统警告：黄色 */
+
+        /* ================= 关闭按钮 ================= */
+        .close-btn {
+            background-color: transparent;
+            color: #9ca3af;
+            border: 1px solid #4b5563;
+            padding: 8px 25px;
+            cursor: pointer;
+            font-size: 13px;
+            float: right;
+            transition: all 0.3s;
+            letter-spacing: 1px;
+            margin-top: 20px;
+        }
+
+        .close-btn:hover {
+            background-color: #374151;
+            color: #f3f4f6;
+        }
+
+        .terminal-close {
+            color: #10b981;
+            border-color: #10b981;
+            text-shadow: none;
+        }
+        
+        .terminal-close:hover {
+            background-color: #10b981;
+            color: #000;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="header-title">
+        寂静的深夜，我重新回到了父亲死去的书房。<br>
+        警察说这只是一个绝症患者可悲的意外，但我知道……一切没有那么简单。<br>
+        <span style="font-size: 12px; color: #6b7280;">（请用鼠标在画面中摸索，寻找父亲可能留下的痕迹）</span>
+    </div>
+
+    <div class="scene-container">
+        <!-- 背景图片 -->
+        <img src="书房.png" alt="书房现场" class="scene-image">
+
+        <!-- 轮椅热区 (已更改为特定函数) -->
+        <div class="hotspot hotspot-wheelchair" onclick="clickWheelchair()"></div>
+
+        <!-- 钟表热区 (已更改为特定函数) -->
+        <div class="hotspot hotspot-clock" onclick="clickClock()"></div>
+
+        <!-- 电脑热区 (由原来的<a>标签改为<div>，受JavaScript控制跳转) -->
+        <div class="hotspot hotspot-computer" onclick="clickComputer()"></div>
+    </div>
+
+    <!-- 前置提示弹窗 (未达成条件时点击轮椅或电脑触发) -->
+    <div class="modal-overlay" id="hintModal">
+        <div class="modal-box">
+            <div class="modal-title">内心的恐惧与抗拒</div>
+            <!-- 文本将通过JS动态替换 -->
+            <div class="modal-text" id="hintText"></div>
+            <button class="close-btn" onclick="closeModal('hintModal')">继续搜查</button>
+        </div>
+    </div>
+
+    <!-- 内心独白弹窗 (轮椅 - 听过录音后触发) -->
+    <div class="modal-overlay" id="evidenceModal">
+        <div class="modal-box">
+            <div class="modal-title">轮椅坐垫下的暗槽</div>
+            <div class="modal-text">
+                录音里的重击声还萦绕在耳边。我伸出颤抖的手，用力拉开坐垫下的医疗储物夹层。伴随着一声沉闷的摩擦声，里面静静地躺着一本厚重的精装样书——那是伊藤明天就要在全球盛大发布的新书，《虚妄之冕》。<br><br>
+                坚硬的书角已经严重凹陷变形，烫金的封面上黏附着早已干涸发黑的血迹，缝隙里甚至还夹杂着几缕属于父亲的灰白头发。<br><br>
+                我死死咬住嘴唇，眼泪无声地砸在手背上。父亲在被伊藤重击休克后，是用怎样的绝望和毅力拖着瘫痪的半个身子爬回轮椅，将这本凶器硬塞进身下的？<br><br>
+                原来，这就是您用命为那个凶手预留的断头台。
+            </div>
+            <button class="close-btn" onclick="closeModal('evidenceModal')">收起样书</button>
+        </div>
+    </div>
+
+    <!-- 隐秘录音终端弹窗 (钟表) -->
+    <div class="modal-overlay" id="audioModal">
+        <div class="terminal-box">
+            <div class="terminal-content">=====================================================
+[SYSTEM_SHIELD] - 隐秘声纹捕捉模块 (V.2.04)
+=====================================================
+> 目标音频文件：LOG_20260619_2015.wav
+> 声纹库匹配结果：
+  <span class="speaker-a">[Speaker_A] -> 匹配：伊藤健司 (置信度 98%)</span>
+  <span class="speaker-b">[Speaker_B] -> 匹配：黑川 龙  (置信度 99%)</span>
+> 正在输出自动转录文本...
+
+[20:15:12] &lt;门锁被从外部开启，伴随沉重脚步声&gt;
+[20:15:18] &lt;物体（推测为厚重书籍）被重重拍在桌面上&gt;
+
+<span class="speaker-a">[Speaker_A]: "老师，样书送来了。《虚妄之冕》，精装烫金，很漂亮吧？下个月的发布会，你只要坐在轮椅上，像个木偶一样点点头就行。反正里面的文字，你那萎缩的大脑也看不懂了。百合连给你擦口水的丝巾都买好了。"</span>
+
+[20:16:04] &lt;长时间的寂静。随后是微弱、但平稳的呼吸声&gt;
+
+<span class="speaker-b">[Speaker_B]: "……这十九年，你模仿我的《暗夜杀机》……模仿得越来越像一条……只配吃残羹剩饭的野狗。"</span>
+
+[20:16:30] &lt;衣物摩擦声，推测 Speaker_A 极度震惊并后退&gt;
+
+<span class="speaker-a">[Speaker_A]: "你……你能说完整的长句？！你的失语症……你刚才看懂了书名？不可能！医生明明说你早就……"</span>
+
+<span class="speaker-b">[Speaker_B]: "（低沉的嘲笑声，伴随轻微喘息）……你在《虚妄之冕》的最后一章里，写了徒弟用枕头捂死瘫痪的恩师。怎么？不敢在现实里动手，只能在纸上……发泄你那可悲的自卑吗？伊藤，你的文字里……全是粗鄙的暴发户气味。"</span>
+
+<span class="speaker-a">[Speaker_A]: "（呼吸急促，情绪开始失控）你一直在装病？！你这个连笔都握不住的老废物！你以为你还是那个高高在上的文豪吗？！外面几百万读者崇拜的是我！是我用我的双手，养了你和百合整整十九年！"</span>
+
+<span class="speaker-b">[Speaker_B]: "你以为你在篡夺我的王座？伊藤……没有我每天晚上在电脑里给你留下的提纲，你连一个完整的诡计都编不圆。你以为你占有了百合？呵……你不过是在我给你们搭建的猪圈里，吃得津津有味罢了。你们……让我感到恶心。"</span>
+
+[20:31:50] &lt;物理撞击声，桌椅被猛烈推开&gt;
+
+<span class="speaker-a">[Speaker_A]: "（咆哮，声音破音）闭嘴！老东西！你去死吧！！带着你那该死的傲慢下地狱去吧！！！"</span>
+
+[20:32:04] <span class="sys-warn">[高危声学特征警告：钝器猛烈撞击声（材质匹配：精装硬纸板/人类颅骨）]</span>
+[20:32:05] &lt;沉闷的重物倒地声&gt;
+[20:32:10] &lt;急促且慌乱的喘息声&gt;
+
+<span class="speaker-a">[Speaker_A]: "（声音颤抖）老……老师？喂……喂！说话啊！不……我没想……我没想杀你……"
+[Speaker_A]: "百合！百合！！"</span>
+
+[20:33:15] &lt;狂奔的脚步声远去&gt;
+[20:33:18] <span class="sys-warn">[系统状态警报：物理门禁被推开，未执行关门与上锁指令]</span>
+
+> 转录暂停。
+> 1小时 5分钟 后，系统重新捕捉到微弱的地面摩擦声与机械门锁转动声...
+=====================================================</div>
+            <button class="close-btn terminal-close" onclick="closeModal('audioModal')">> [执行：终止回放]</button>
+        </div>
+    </div>
+
+    <script>
+        // 定义状态锁
+        let hasHeardAudio = false; // 是否听了录音
+        let hasFoundBook = false;  // 是否找到了轮椅下的书
+
+        // 点击钟表热区：直接听录音并解锁轮椅
+        function clickClock() {
+            hasHeardAudio = true;
+            document.getElementById('audioModal').style.display = 'flex';
+        }
+
+        // 点击轮椅热区
+        function clickWheelchair() {
+            if (!hasHeardAudio) {
+                // 未听录音，提示不敢靠近轮椅
+                document.getElementById('hintText').innerHTML = "那是父亲生前一直坐着的轮椅。四天前，他就死在那旁边。<br><br>在没有弄清楚房间里到底发生了什么之前，我甚至不敢靠近它，不敢去碰触他留下的最后气息。<br>我需要先在房间里找找其他的线索……如果他真的想告诉我什么，一定留下了记录。";
+                document.getElementById('hintModal').style.display = 'flex';
+            } else {
+                // 听过录音了，发现书本，并解锁电脑
+                hasFoundBook = true; 
+                document.getElementById('evidenceModal').style.display = 'flex';
+            }
+        }
+
+        // 点击电脑热区
+        function clickComputer() {
+            if (!hasFoundBook) {
+                // 只要还没找到书（哪怕听了录音），就提示不敢靠近书桌
+                document.getElementById('hintText').innerHTML = "那是父亲生前使用的书桌和电脑。四天前，他就死在那片区域。<br><br>在找到能支撑我面对真相的确凿证据前，我甚至不敢靠近那里，不敢去碰触他留下的最后气息。<br>我需要先在房间里找找其他的线索……";
+                document.getElementById('hintModal').style.display = 'flex';
+            } else {
+                // 找到了凶器书本，鼓起勇气打开电脑
+                window.open('ryu_desktop.html', '_blank');
+            }
+        }
+
+        // 关闭弹窗
+        function closeModal(modalId) {
+            document.getElementById(modalId).style.display = 'none';
+        }
+
+        // 点击遮罩层外区域也可关闭所有弹窗
+        window.onclick = function(event) {
+            var evidenceModal = document.getElementById('evidenceModal');
+            var audioModal = document.getElementById('audioModal');
+            var hintModal = document.getElementById('hintModal');
+            
+            if (event.target == evidenceModal) { evidenceModal.style.display = "none"; }
+            if (event.target == audioModal) { audioModal.style.display = "none"; }
+            if (event.target == hintModal) { hintModal.style.display = "none"; }
+        }
+    </script>
+
+</body>
+</html>

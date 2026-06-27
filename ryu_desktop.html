@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>系统终端 - ROOT: R.KUROKAWA</title>
+    <style>
+        /* ================= 基础桌面与OS风格 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #0a1118;
+            background-image: 
+                linear-gradient(rgba(0, 20, 30, 0.8) 1px, transparent 1px),
+                linear-gradient(90deg, rgba(0, 20, 30, 0.8) 1px, transparent 1px);
+            background-size: 30px 30px;
+            font-family: "Courier New", Courier, monospace;
+            color: #c8d6e5;
+            height: 100vh;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* 桌面图标网格 - 优化为类似真实OS的从上到下、自动折行排列 */
+        .desktop-grid {
+            padding: 30px;
+            display: flex;
+            flex-direction: column;
+            flex-wrap: wrap;
+            align-content: flex-start;
+            gap: 30px 40px;
+            height: 100%;
+        }
+
+        .icon {
+            width: 100px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            cursor: pointer;
+            padding: 10px;
+            border-radius: 5px;
+            transition: background 0.2s;
+        }
+        .icon:hover { background: rgba(255, 255, 255, 0.1); }
+        .icon-svg { width: 50px; height: 50px; margin-bottom: 10px; filter: drop-shadow(0 2px 4px rgba(0,0,0,0.5)); }
+        .icon-text {
+            font-size: 12px;
+            text-align: center;
+            text-shadow: 1px 1px 2px #000;
+            background: rgba(0,0,0,0.5);
+            padding: 2px 6px;
+            border-radius: 3px;
+            word-break: break-all;
+        }
+
+        /* ================= 弹窗 (OS Window) ================= */
+        .window {
+            position: absolute;
+            top: 50%; left: 50%;
+            transform: translate(-50%, -50%);
+            width: 600px;
+            background: #1e272e;
+            border: 1px solid #485460;
+            box-shadow: 0 20px 50px rgba(0,0,0,0.8);
+            display: none;
+            z-index: 10;
+            flex-direction: column;
+        }
+        .window-header {
+            background: #485460;
+            padding: 8px 15px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            font-size: 13px;
+            font-weight: bold;
+            color: #fff;
+        }
+        .close-btn {
+            background: #ff3f34;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            cursor: pointer;
+        }
+        .window-content { padding: 30px; line-height: 1.6; max-height: 70vh; overflow-y: auto; }
+
+        /* ================= 文档与排版样式 ================= */
+        .hospital-header { border-bottom: 2px solid #575fcf; padding-bottom: 10px; margin-bottom: 20px; }
+        .contract-header { border-bottom: 2px solid #f1c40f; padding-bottom: 10px; margin-bottom: 20px; text-align: center; }
+        .red-stamp { color: #ff3f34; font-weight: bold; border: 2px solid #ff3f34; padding: 2px 5px; display: inline-block; transform: rotate(-5deg); margin-left: 20px; }
+        .contract-stamp { font-size: 18px; padding: 8px 15px; border-width: 3px; border-radius: 4px; transform: rotate(-10deg); margin-top: 15px; opacity: 0.8; }
+        
+        /* 纯文本文件样式 */
+        .txt-content {
+            white-space: pre-wrap;
+            color: #d2dae2;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 14px;
+            line-height: 1.8;
+            background: #11141a;
+            padding: 20px;
+            border: 1px inset #485460;
+        }
+
+        /* 系统备忘录 (客观视角的日志) */
+        .system-log {
+            margin-top: 30px;
+            padding: 15px;
+            background: rgba(0, 0, 0, 0.3);
+            border-left: 4px solid #808e9b;
+            color: #a4b0be;
+            font-size: 13px;
+        }
+        .log-title {
+            color: #d2dae2;
+            font-weight: bold;
+            margin-bottom: 8px;
+            font-size: 12px;
+            text-transform: uppercase;
+        }
+
+        /* 财务账单 */
+        .finance-table { width: 100%; border-collapse: collapse; margin-top: 15px; font-size: 13px; }
+        .finance-table th, .finance-table td { border: 1px solid #485460; padding: 8px; text-align: left; }
+        .finance-table th { background: #0f1419; color: #808e9b; }
+        
+        .macro-btn {
+            display: block;
+            width: 100%;
+            padding: 12px;
+            margin-top: 20px;
+            background: #2f3640;
+            border: 1px solid #7f8fa6;
+            color: #dcdde1;
+            text-align: center;
+            cursor: pointer;
+            font-family: inherit;
+            font-size: 12px;
+            transition: all 0.3s;
+        }
+        .macro-btn:hover { background: #353b48; border-color: #f5f6fa; }
+        
+        /* 宏展开后的状态 */
+        .true-data { display: none; color: #0be881; font-family: monospace; }
+        .false-data { color: #d2dae2; }
+        .decrypted .false-data { text-decoration: line-through; opacity: 0.5; }
+        .decrypted .true-data { display: block; margin-top: 4px; }
+
+    </style>
+</head>
+<body>
+
+    <div class="desktop-grid">
+        
+        <div class="icon" onclick="openWin('win-medical')">
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="#ff5e57" stroke-width="2"><path d="M22 12h-4l-3 9L9 3l-3 9H2"/></svg>
+            <div class="icon-text">MED_20070214.pdf</div>
+        </div>
+
+        <div class="icon" onclick="openWin('win-contract')">
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="#f1c40f" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><circle cx="12" cy="15" r="3"/><path d="M12 18v3"/></svg>
+            <div class="icon-text">CONTRACT_200703.pdf</div>
+        </div>
+
+        <div class="icon" onclick="openWin('win-finance')">
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="#05c46b" stroke-width="2"><rect x="2" y="4" width="20" height="16" rx="2" ry="2"/><line x1="2" y1="10" x2="22" y2="10"/></svg>
+            <div class="icon-text">LEDGER_A_MASKED.xls</div>
+        </div>
+
+        <div class="icon" onclick="openWin('win-dna')">
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="#0fbcf9" stroke-width="2"><path d="M12 2v20M17 5H9.5a3.5 3.5 0 0 0 0 7h5a3.5 3.5 0 0 1 0 7H6"/></svg>
+            <div class="icon-text">FORENSIC_REP.pdf</div>
+        </div>
+
+        <div class="icon" onclick="openWin('win-confession')">
+            <svg class="icon-svg" viewBox="0 0 24 24" fill="none" stroke="#dcdde1" stroke-width="2"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="8" y1="13" x2="16" y2="13"/><line x1="8" y1="17" x2="16" y2="17"/><line x1="10" y1="9" x2="16" y2="9"/></svg>
+            <div class="icon-text">REGRET.txt</div>
+        </div>
+
+    </div>
+
+    <div class="window" id="win-medical">
+        <div class="window-header">
+            <span>📄 MED_20070214.pdf - Viewer</span>
+            <div class="close-btn" onclick="closeWin('win-medical')"></div>
+        </div>
+        <div class="window-content">
+            <div class="hospital-header">
+                <h2>洛和会医疗中心</h2>
+                <div style="color: #808e9b; font-size: 12px;">DATE: 2007-02-14</div>
+            </div>
+            <p><strong>SUBJECT：</strong> 黑川 龙</p>
+            <p><strong>DIAGNOSIS：</strong> 急性缺血性脑卒中</p>
+            <p><strong>CLINICAL NOTES：</strong></p>
+            <ul style="margin-left: 20px; margin-top: 10px; color: #d2dae2;">
+                <li>右侧肢体深度偏瘫。</li>
+                <li>伴随阵发性失语及吞咽困难。</li>
+                <li><span style="color:#ff3f34;">并发永久性无精症（丧失生育能力）。</span> <span class="red-stamp">IRREVERSIBLE</span></li>
+            </ul>
+            <div class="system-log">
+                <div class="log-title">>> SYSTEM_MEMO // 2007-03-01</div>
+                记录项：医疗状况应对策略。<br>
+                1. 维持“重度认知障碍与持续性失语”的外在表象。<br>
+                2. 绝对禁止向主要照护人（黑川百合、伊藤健司）展示当前阅读及逻辑思考能力。<br>
+                3. 目的：降低同住者防备阈值，建立长期监控优势。
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="win-contract">
+        <div class="window-header">
+            <span>📄 CONTRACT_20070312.pdf - SECURE</span>
+            <div class="close-btn" onclick="closeWin('win-contract')"></div>
+        </div>
+        <div class="window-content">
+            <div class="contract-header">
+                <h2 style="letter-spacing: 2px;">保密与代笔协议 (NDA)</h2>
+                <div style="color: #808e9b; font-size: 12px;">DATE: 2007-03-12</div>
+            </div>
+            <p><strong>甲方（委托方）：</strong> 黑川 龙</p>
+            <p><strong>乙方（受托方）：</strong> 伊藤 健司</p>
+            <br>
+            <p style="color: #a4b0be; text-align: justify;">
+                鉴于甲方因近期健康原因（中风偏瘫）无法亲自执笔，为维持黑川家族在文学界之地位与合约履行，经双方协商一致，签订本绝密代笔协议：
+            </p>
+            <ul style="margin-left: 20px; margin-top: 15px; color: #d2dae2; line-height: 1.8;">
+                <li><strong>第一条：</strong>自本协议生效起，乙方须完全模仿甲方文风进行创作。所有产出作品之署名权、版权均绝对归甲方（黑川龙）单独所有。</li>
+                <li><strong>第二条：</strong>作为补偿，甲方将承担乙方在黑川家的一切生活开销，并承诺在其文学道路上提供所有可能的提携与资源。</li>
+                <li><strong>第三条（核心保密条款）：</strong>乙方<span style="color:#ff3f34; font-weight: bold;">绝不可向任何第三方（包括甲方配偶及子女）透露本协议的存在</span>。一旦违约，甲方有权收回给予乙方的一切行业资源，并让其在文坛身败名裂。</li>
+            </ul>
+            
+            <div style="margin-top: 30px; display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <p>甲方签字：<span style="font-family: 'Brush Script MT', cursive; font-size: 20px; text-decoration: underline;"> 黑川 龙 </span></p>
+                    <div class="red-stamp contract-stamp">[ 黑川龙 契约印 ]</div>
+                </div>
+                <div>
+                    <p>乙方签字：<span style="font-family: 'Brush Script MT', cursive; font-size: 20px; text-decoration: underline;"> 伊藤健司 </span></p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="win-confession">
+        <div class="window-header">
+            <span>📝 REGRET.txt - Notepad</span>
+            <div class="close-btn" onclick="closeWin('win-confession')"></div>
+        </div>
+        <div class="window-content" style="padding: 0;">
+            <div class="txt-content">
+我错了。
+那份2007年的合同，是我这辈子签过最致命的东西。
+
+二月份中风偏瘫后，我连这支跟了我三十年的钢笔都握不住了。
+那时候，光文社在等我的连载，同行在等看我的笑话。
+因为放不下黑川家族那点可笑的文学颜面，因为我那该死的傲气，我做出了一个摧毁了我们全家的决定——我把伊藤健司这个恶魔亲手招进了家门，赐予了他执笔的权力。
+
+我以为他只是我的影子，一个听话的代笔工具。
+却没想到，影子在汲取了我的名声后，长出了獠牙。
+他不仅慢慢在手稿里夹带他那套阴暗控制的私货，还用那份虚假的权力在家里作威作福。他用那张伪善的面孔，洗脑了百合，孤立了我的女儿……
+
+是我亲手创造了这个怪物。
+如果当年我坦然接受残疾，当众宣布封笔，这一切悲剧是不是就不会发生？
+我的傲慢，最终让我的孩子们付出了血的代价。
+
+现在，我唯一能做的，就是装作一个丧失心智的废人。
+在这张轮椅上，看着他们表演，在暗中布下这最后一张网……
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="win-dna">
+        <div class="window-header">
+            <span>📄 FORENSIC_REP.pdf - SECURE</span>
+            <div class="close-btn" onclick="closeWin('win-dna')"></div>
+        </div>
+        <div class="window-content">
+            <div style="text-align: center; margin-bottom: 20px; border: 1px solid #555; padding: 10px;">
+                <h3 style="letter-spacing: 5px;">法医物证司法鉴定所</h3>
+            </div>
+            <p><strong>CLIENT：</strong> 黑川 龙</p>
+            <p><strong>SAMPLE A：</strong> 黑川龙 (血液)</p>
+            <p><strong>SAMPLE B：</strong> 黑川雪 (毛发, 提取日期: 2015-08)</p>
+            <br>
+            <p><strong>CONCLUSION：</strong></p>
+            <p style="font-size: 16px; color: #ff3f34; border-left: 4px solid #ff3f34; padding-left: 10px; margin-top: 10px;">
+                支持排除 SAMPLE A 为 SAMPLE B 的生物学父亲。<br>
+                （父权相对机会 0.00%）
+            </p>
+            <div class="system-log">
+                <div class="log-title">>> LEGAL_DIRECTIVE // ATTACHMENT_TO_WILL</div>
+                关联文档：海外信托基金设立书 (ID: YUKITRUST-0712)<br>
+                1. 本鉴定报告结果不影响原定遗产分配方案。<br>
+                2. 受益人【黑川雪】为唯一合法继承人的设定不可撤销。<br>
+                3. 权限变更：本目录已执行系统级锁死，对本地网络（即百合、伊藤设备）设置访问屏蔽。
+            </div>
+        </div>
+    </div>
+
+    <div class="window" id="win-finance">
+        <div class="window-header">
+            <span>📊 LEDGER_A_MASKED.xls</span>
+            <div class="close-btn" onclick="closeWin('win-finance')"></div>
+        </div>
+        <div class="window-content" id="finance-content">
+            <h3 style="color: #d2dae2; margin-bottom: 5px; font-size: 14px;">[常规显示模式] 外部审计视图</h3>
+            <p style="font-size: 12px; color: #808e9b; margin-bottom: 10px;">状态：当前表格已被外部设备(IP:192.168.1.104 - Y.KUROKAWA)查阅 47 次。</p>
+            
+            <table class="finance-table">
+                <tr>
+                    <th>交易日期</th>
+                    <th>收款方</th>
+                    <th>附言/用途 (显示值 -> 真实路由)</th>
+                    <th>金额 (JPY)</th>
+                </tr>
+                <tr>
+                    <td>2025-11-05</td>
+                    <td>Miyazaki Anna</td>
+                    <td>
+                        <span class="false-data">东京丽思卡尔顿-套房常包</span>
+                        <span class="true-data">> ROUTE: 临终关怀医院-重症无菌室租用</span>
+                    </td>
+                    <td>2,500,000</td>
+                </tr>
+                <tr>
+                    <td>2026-02-14</td>
+                    <td>Miyazaki Anna</td>
+                    <td>
+                        <span class="false-data">珠宝购入/特别赠礼</span>
+                        <span class="true-data">> ROUTE: 海外离岸信托注资 (Beneficiary: YUKI)</span>
+                    </td>
+                    <td>15,000,000</td>
+                </tr>
+                <tr>
+                    <td>2026-05-20</td>
+                    <td>Miyazaki Anna</td>
+                    <td>
+                        <span class="false-data">私人护理费与封口补偿</span>
+                        <span class="true-data">> ROUTE: 海外离岸信托注资 (Beneficiary: YUKI)</span>
+                    </td>
+                    <td>20,000,000</td>
+                </tr>
+            </table>
+
+            <div class="system-log" style="display: none;" id="finance-note">
+                <div class="log-title">>> AUDIT_TRAIL_ACTIVE // 资金流向审计报告</div>
+                > 记录：目标对象（妻子）多次查阅本表，未察觉表层数据伪装，误认为资金用于私人奢靡消费。<br>
+                > 核实：所有实体转账均由代理人(宫崎安奈)完成清洗。<br>
+                > 结果：黑川家族核心资产已全数转移至安全账户，剥离完成率 100%。
+            </div>
+
+            <button class="macro-btn" id="decrypt-btn" onclick="runMacro()">[ 执行宏：Disable_UI_Masking.vba ]</button>
+        </div>
+    </div>
+
+    <script>
+        function openWin(id) {
+            // 将所有窗口层级降低
+            document.querySelectorAll('.window').forEach(win => win.style.zIndex = 10);
+            // 选中的窗口设为最高层级并显示
+            const target = document.getElementById(id);
+            target.style.zIndex = 20;
+            target.style.display = 'flex';
+        }
+
+        function closeWin(id) {
+            document.getElementById(id).style.display = 'none';
+        }
+
+        function runMacro() {
+            const content = document.getElementById('finance-content');
+            const btn = document.getElementById('decrypt-btn');
+            const note = document.getElementById('finance-note');
+            
+            btn.innerText = "EXECUTING MACRO... UNMASKING DATA...";
+            btn.style.color = "#0be881";
+            btn.style.borderColor = "#0be881";
+            
+            setTimeout(() => {
+                content.classList.add('decrypted');
+                content.querySelector('h3').innerText = "[最高权限模式] 资金真实路由网关";
+                content.querySelector('h3').style.color = "#0be881";
+                btn.style.display = "none";
+                note.style.display = "block";
+            }, 800);
+        }
+    </script>
+</body>
+</html>

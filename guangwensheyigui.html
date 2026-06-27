@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>光文社 - 内部手稿痕迹核查系统</title>
+    <style>
+        /* ================= 基础重置与企业内网风格 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            background-color: #1e1e1e; /* 暗色调核查室风格 */
+            font-family: "Meiryo", "Helvetica Neue", Arial, sans-serif;
+            color: #e0e0e0;
+            display: flex;
+            flex-direction: column;
+            overflow: hidden; /* 防止移动端整体页面滑动 */
+        }
+
+        /* 顶部导航栏 */
+        .sys-header {
+            background-color: #0b192c;
+            border-bottom: 2px solid #1a73e8;
+            padding: 15px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.5);
+            z-index: 10;
+            flex-shrink: 0;
+        }
+        .sys-logo {
+            font-size: 20px;
+            font-weight: bold;
+            color: #ffffff;
+            letter-spacing: 1px;
+            display: flex;
+            align-items: center;
+        }
+        .sys-logo span { color: #1a73e8; margin-right: 8px; font-size: 24px; }
+        .sys-info {
+            font-size: 13px;
+            color: #888;
+            font-family: monospace;
+        }
+        .sec-level {
+            background-color: #d93025;
+            color: white;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: bold;
+            margin-left: 10px;
+        }
+
+        /* 主体操作区 */
+        .workspace {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 20px;
+            overflow-y: auto;
+            position: relative;
+        }
+
+        /* 操作提示面板 */
+        .control-panel {
+            background-color: #2c2c2c;
+            border: 1px solid #444;
+            border-radius: 8px;
+            padding: 12px 20px;
+            margin-bottom: 20px;
+            text-align: center;
+            width: 100%;
+            max-width: 650px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+        .instruction {
+            color: #4caf50;
+            font-size: 14px;
+            font-weight: bold;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+        .instruction::before {
+            content: '🔍'; margin-right: 8px;
+        }
+        .sub-instruction {
+            font-size: 12px;
+            color: #aaa;
+        }
+
+        /* ================= 核心擦除区域 ================= */
+        .canvas-container {
+            position: relative;
+            width: 100%;
+            max-width: 600px; /* 限制最大宽度，保证图片比例 */
+            background-color: #000;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.8);
+            border: 1px solid #555;
+            border-radius: 4px;
+            /* 鼠标变成橡皮擦图案 (圆形准星) */
+            cursor: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="30" height="30" viewBox="0 0 30 30"><circle cx="15" cy="15" r="14" fill="none" stroke="white" stroke-width="2"/><circle cx="15" cy="15" r="2" fill="white"/></svg>') 15 15, crosshair;
+        }
+
+        /* 底层图片 (yiguishougao.png) */
+        #bottom-image {
+            display: block;
+            width: 100%;
+            height: auto;
+            user-select: none;
+            pointer-events: none; /* 防止底层图片干扰鼠标事件 */
+        }
+
+        /* 顶层 Canvas (用来绘制 yiguishougao1.png 并擦除) */
+        #top-canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            touch-action: none; /* 关键：禁止移动端在该区域上的默认手势(如滚动、缩放) */
+        }
+        
+        /* 加载提示 */
+        #loading {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 16px;
+            z-index: 20;
+            pointer-events: none;
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 顶部系统栏 -->
+    <div class="sys-header">
+        <div class="sys-logo">
+            <span>⎈</span> 光文社 内部档案系统
+        </div>
+        <div class="sys-info">
+            档案编号: DOC-1996-CR <span class="sec-level">绝密 S级</span>
+        </div>
+    </div>
+
+    <!-- 工作区 -->
+    <div class="workspace">
+        <div class="control-panel">
+            <div class="instruction">正在使用紫外线涂层剥离工具</div>
+            <div class="sub-instruction">擦除表层字迹，核验底层真实原稿。</div>
+        </div>
+
+        <div class="canvas-container" id="container">
+            <div id="loading">数据加载中...</div>
+            <!-- 第一张图片：底层真相 -->
+            <img id="bottom-image" src="yiguishougao.png" alt="底稿真相">
+            <!-- Canvas：绘制第二张图片作为遮罩层 -->
+            <canvas id="top-canvas"></canvas>
+        </div>
+    </div>
+
+    <script>
+        window.addEventListener('load', () => {
+            const container = document.getElementById('container');
+            const bottomImage = document.getElementById('bottom-image');
+            const canvas = document.getElementById('top-canvas');
+            const ctx = canvas.getContext('2d', { willReadFrequently: true });
+            const loading = document.getElementById('loading');
+
+            // 定义顶层图片 (第二张图片)
+            const topImageObj = new Image();
+            topImageObj.src = 'yiguishougao1.png';
+
+            // 当顶层图片加载完成后初始化 Canvas
+            topImageObj.onload = () => {
+                loading.style.display = 'none';
+
+                // 将 Canvas 的实际像素尺寸设置为图片的原始像素尺寸，保证高清
+                canvas.width = topImageObj.width;
+                canvas.height = topImageObj.height;
+
+                // 把第二张图片画满整个 Canvas
+                ctx.drawImage(topImageObj, 0, 0, canvas.width, canvas.height);
+
+                // ✨ 核心魔法：设置合成属性为 destination-out
+                // 这样之后在这个 canvas 上画的任何内容，都会变成“透明”的，从而露出底下的图片
+                ctx.globalCompositeOperation = 'destination-out';
+
+                // 设置橡皮擦的属性 (粗细和圆滑度)
+                ctx.lineWidth = 50; // 橡皮擦大小
+                ctx.lineCap = 'round';
+                ctx.lineJoin = 'round';
+                
+                // 增加一点阴影让边缘看起来更像真实的擦除/刮开痕迹
+                ctx.shadowBlur = 15;
+                ctx.shadowColor = "rgba(0,0,0,1)";
+            };
+
+            // 处理交互逻辑
+            let isDrawing = false;
+            let lastX = 0;
+            let lastY = 0;
+
+            // 获取鼠标/手指在 Canvas 内部的准确坐标 (兼容缩放)
+            function getCoordinates(e) {
+                const rect = canvas.getBoundingClientRect();
+                let clientX, clientY;
+
+                if (e.touches && e.touches.length > 0) {
+                    clientX = e.touches[0].clientX;
+                    clientY = e.touches[0].clientY;
+                } else {
+                    clientX = e.clientX;
+                    clientY = e.clientY;
+                }
+
+                // 计算 CSS 显示尺寸与 Canvas 实际像素尺寸的比例
+                const scaleX = canvas.width / rect.width;
+                const scaleY = canvas.height / rect.height;
+
+                return {
+                    x: (clientX - rect.left) * scaleX,
+                    y: (clientY - rect.top) * scaleY
+                };
+            }
+
+            // 开始擦除
+            function startDrawing(e) {
+                isDrawing = true;
+                const pos = getCoordinates(e);
+                lastX = pos.x;
+                lastY = pos.y;
+                
+                // 点击时先画一个圆点，防止只点击不移动时没有擦除效果
+                ctx.beginPath();
+                ctx.arc(lastX, lastY, ctx.lineWidth / 2, 0, Math.PI * 2);
+                ctx.fill();
+            }
+
+            // 移动擦除
+            function draw(e) {
+                if (!isDrawing) return;
+                e.preventDefault(); // 阻止移动端的默认滚动行为
+
+                const pos = getCoordinates(e);
+                
+                ctx.beginPath();
+                ctx.moveTo(lastX, lastY);
+                ctx.lineTo(pos.x, pos.y);
+                ctx.stroke();
+
+                lastX = pos.x;
+                lastY = pos.y;
+            }
+
+            // 停止擦除
+            function stopDrawing() {
+                isDrawing = false;
+            }
+
+            // 绑定 PC 端鼠标事件
+            canvas.addEventListener('mousedown', startDrawing);
+            canvas.addEventListener('mousemove', draw);
+            canvas.addEventListener('mouseup', stopDrawing);
+            canvas.addEventListener('mouseleave', stopDrawing);
+
+            // 绑定移动端触摸事件
+            canvas.addEventListener('touchstart', startDrawing, { passive: false });
+            canvas.addEventListener('touchmove', draw, { passive: false });
+            canvas.addEventListener('touchend', stopDrawing);
+            canvas.addEventListener('touchcancel', stopDrawing);
+        });
+    </script>
+</body>
+</html>

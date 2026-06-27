@@ -1,0 +1,429 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Search Engine - macOS Safari</title>
+    <style>
+        /* ================= 基础重置与桌面背景 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            /* 模拟 macOS Monterey/Big Sur 风格的壁纸渐变色 */
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* ================= macOS 浏览器视窗 ================= */
+        .mac-window {
+            width: 85%;
+            max-width: 1100px;
+            height: 75vh;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: windowPopUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+            opacity: 0;
+            transform: scale(0.95) translateY(10px);
+            position: relative;
+        }
+
+        @keyframes windowPopUp {
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* 顶部控制栏 (Title Bar) */
+        .title-bar {
+            height: 52px;
+            background-color: #f5f5f7;
+            border-bottom: 1px solid #d1d1d6;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* 红黄绿红绿灯按钮 */
+        .traffic-lights {
+            display: flex;
+            gap: 8px;
+            width: 60px;
+        }
+        .traffic-lights span {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .close { background-color: #ff5f56; border: 1px solid #e0443e; }
+        .minimize { background-color: #ffbd2e; border: 1px solid #dea123; }
+        .maximize { background-color: #27c93f; border: 1px solid #1aab29; }
+
+        /* 浏览器地址栏 */
+        .url-bar {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            left: 0; right: 0;
+            pointer-events: none;
+        }
+        .url-input {
+            width: 40%;
+            min-width: 300px;
+            height: 28px;
+            background-color: #e3e3e5;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1d1d1f;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        .url-input span { opacity: 0.5; margin-right: 5px; }
+
+        /* ================= 搜索引擎内容区 ================= */
+        .browser-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding-top: 15vh;
+            background-color: #ffffff;
+            position: relative;
+        }
+
+        /* --- 右上角历史记录下拉菜单 --- */
+        .top-right-nav {
+            position: absolute;
+            top: 20px;
+            right: 25px;
+            z-index: 100;
+        }
+        .history-dropdown {
+            position: relative;
+            display: inline-block;
+        }
+        .history-btn {
+            background: none;
+            border: none;
+            color: #5f6368;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 8px 12px;
+            border-radius: 4px;
+            transition: background-color 0.2s, color 0.2s;
+            display: flex;
+            align-items: center;
+            gap: 6px;
+        }
+        .history-btn:hover {
+            background-color: #f1f3f4;
+            color: #202124;
+        }
+        
+        /* 下拉面板 */
+        .history-menu {
+            display: none; /* 默认隐藏 */
+            position: absolute;
+            right: 0;
+            top: 100%;
+            margin-top: 5px;
+            background-color: #fff;
+            min-width: 340px;
+            border-radius: 8px;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+            border: 1px solid #dadce0;
+            overflow: hidden;
+            z-index: 101;
+            text-align: left;
+        }
+        /* 悬停按钮时显示下拉面板 */
+        .history-dropdown:hover .history-menu {
+            display: block;
+            animation: fadeInMenu 0.2s ease forwards;
+        }
+        @keyframes fadeInMenu {
+            from { opacity: 0; transform: translateY(-5px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .history-header {
+            padding: 12px 16px;
+            font-size: 12px;
+            color: #70757a;
+            border-bottom: 1px solid #f1f3f4;
+            background: #f8f9fa;
+            font-weight: bold;
+        }
+        .history-item {
+            display: flex;
+            align-items: flex-start;
+            padding: 14px 16px;
+            text-decoration: none;
+            color: #1a0dab;
+            font-size: 14px;
+            transition: background-color 0.2s;
+            line-height: 1.4;
+        }
+        .history-item:hover {
+            background-color: #f1f3f4;
+        }
+        .history-icon {
+            margin-right: 12px;
+            font-size: 16px;
+            opacity: 0.7;
+            margin-top: 2px;
+        }
+        .history-text {
+            color: #3c4043;
+        }
+        /* -------------------------------- */
+
+        /* 搜索 Logo */
+        .search-logo {
+            font-size: 80px;
+            font-weight: 700;
+            letter-spacing: -2px;
+            margin-bottom: 30px;
+            user-select: none;
+        }
+        .search-logo span:nth-child(1) { color: #4285F4; }
+        .search-logo span:nth-child(2) { color: #EA4335; }
+        .search-logo span:nth-child(3) { color: #FBBC05; }
+        .search-logo span:nth-child(4) { color: #4285F4; }
+        .search-logo span:nth-child(5) { color: #34A853; }
+        .search-logo span:nth-child(6) { color: #EA4335; }
+
+        /* 搜索输入框 */
+        .search-box {
+            width: 90%;
+            max-width: 580px;
+            position: relative;
+        }
+        .search-box input {
+            width: 100%;
+            height: 46px;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            padding: 0 20px 0 45px;
+            font-size: 16px;
+            outline: none;
+            transition: box-shadow 0.2s ease;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.05);
+        }
+        .search-box input:hover, .search-box input:focus {
+            box-shadow: 0 1px 6px rgba(32, 33, 36, 0.28);
+            border-color: rgba(223, 225, 229, 0);
+        }
+        
+        /* 放大镜图标 */
+        .search-icon {
+            position: absolute;
+            left: 15px;
+            top: 14px;
+            width: 18px; height: 18px;
+            opacity: 0.4;
+        }
+
+        /* 搜索按钮 */
+        .search-buttons {
+            display: flex;
+            gap: 12px;
+            margin-top: 30px;
+        }
+        .search-buttons button {
+            background-color: #f8f9fa;
+            border: 1px solid #f8f9fa;
+            border-radius: 4px;
+            color: #3c4043;
+            font-size: 14px;
+            padding: 10px 20px;
+            cursor: pointer;
+            outline: none;
+            transition: all 0.2s;
+        }
+        .search-buttons button:hover {
+            border: 1px solid #dadce0;
+            box-shadow: 0 1px 1px rgba(0,0,0,0.1);
+            color: #202124;
+        }
+
+        /* --- 新增：页内未找到结果报错框 --- */
+        .error-msg {
+            display: none;
+            margin-top: 25px;
+            padding: 12px 20px;
+            background-color: #fce8e6;
+            color: #d93025;
+            border-radius: 8px;
+            font-size: 14px;
+            max-width: 580px;
+            width: 90%;
+            text-align: center;
+            border: 1px solid #fad2cf;
+            box-shadow: 0 2px 6px rgba(217, 48, 37, 0.15);
+            animation: shake 0.4s ease;
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            25% { transform: translateX(-5px); }
+            50% { transform: translateX(5px); }
+            75% { transform: translateX(-5px); }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="mac-window">
+        <div class="title-bar">
+            <div class="traffic-lights">
+                <span class="close"></span>
+                <span class="minimize"></span>
+                <span class="maximize"></span>
+            </div>
+            <div class="url-bar">
+                <div class="url-input">
+                    <span>🔒</span> www.search-engine.com
+                </div>
+            </div>
+        </div>
+
+        <div class="browser-content">
+            
+            <div class="top-right-nav">
+                <div class="history-dropdown">
+                    <button class="history-btn">
+                        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                          <path d="M8.515 1.019A7 7 0 0 0 8 1V0a8 8 0 0 1 .589.022l-.074.997zm2.004.45a7.003 7.003 0 0 0-.985-.299l.219-.976c.383.086.757.205 1.126.342l-.36.933zm1.37.71a7.01 7.01 0 0 0-.439-.27l.493-.87a8.025 8.025 0 0 1 .979.654l-.615.789a6.996 6.996 0 0 0-.418-.302zm1.834 1.79a6.99 6.99 0 0 0-.653-.796l.724-.69c.27.285.52.59.747.91l-.818.576zm.744 1.352a7.08 7.08 0 0 0-.214-.468l.893-.45a7.976 7.976 0 0 1 .45 1.088l-.95.313a7.023 7.023 0 0 0-.179-.483zm.53 2.507a6.991 6.991 0 0 0-.1-1.025l.985-.17c.067.386.106.778.116 1.17l-1 .025zm-.131 1.538c.033-.17.06-.339.081-.51l.993.123a7.957 7.957 0 0 1-.23 1.155l-.964-.267c.046-.165.086-.332.12-.501zm-.952 2.379c.184-.29.346-.594.486-.908l.914.405c-.16.36-.345.706-.555 1.038l-.845-.535zm-.964 1.205c.122-.122.239-.248.35-.378l.758.653a8.073 8.073 0 0 1-.401.432l-.707-.707z"/>
+                          <path d="M8 1a7 7 0 1 0 4.95 11.95l.707.707A8.001 8.001 0 1 1 8 0v1z"/>
+                          <path d="M7.5 3a.5.5 0 0 1 .5.5v5.21l3.248 1.856a.5.5 0 0 1-.496.868l-3.5-2A.5.5 0 0 1 7 9V3.5a.5.5 0 0 1 .5-.5z"/>
+                        </svg>
+                        历史记录
+                    </button>
+                    <div class="history-menu">
+                        <div class="history-header">近期搜索与访问</div>
+                        
+                        <a href="police_bulletin.html" target="_blank" class="history-item">
+                            <span class="history-icon"></span>
+                            <span class="history-text">关于东京都目黑区居民黑川龙身亡事件的调查情况通报</span>
+                        </a>
+                        
+                    </div>
+                </div>
+            </div>
+            <div class="search-logo">
+                <span>S</span><span>e</span><span>a</span><span>r</span><span>c</span><span>h</span>
+            </div>
+            
+            <div class="search-box">
+                <svg class="search-icon" focusable="false" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M15.5 14h-.79l-.28-.27A6.471 6.471 0 0 0 16 9.5 6.5 6.5 0 1 0 9.5 16c1.61 0 3.09-.59 4.23-1.57l.27.28v.79l5 4.99L20.49 19l-4.99-5zm-6 0C7.01 14 5 11.99 5 9.5S7.01 5 9.5 5 14 7.01 14 9.5 11.99 14 9.5 14z"></path></svg>
+                <input type="text" id="searchInput" autocomplete="off">
+            </div>
+
+            <div class="search-buttons">
+                <button type="button" onclick="executeSearch()">全网搜索</button>
+                <button type="button">手气不错</button>
+            </div>
+
+            <div id="errorMsg" class="error-msg"></div>
+
+        </div>
+    </div>
+
+    <script>
+        /**
+         * [SECURE NETWORK SCRIPT]
+         * System: Kurokawa Terminal
+         * Encryption: Base64 + URI Component Padding
+         */
+        function executeSearch() {
+            var _0xInput = document.getElementById('searchInput');
+            var _0xError = document.getElementById('errorMsg');
+            
+            if (!_0xInput) return;
+            var _0xQuery = _0xInput.value.trim();
+            if (_0xQuery === '') {
+                _0xError.style.display = 'none';
+                return;
+            }
+
+            // 字典加密
+            var _0xDict = {
+                'JUU5JUJCJTkxJUU1JUI3JTlEJUU5JUJFJTk5': 'search_kurokawa.html', 
+                'JUU0JUJDJThBJUU4JTk3JUE0JUU1JTgxJUE1JUU1JThGJUI4': 'search_yiteng.html', 
+                'JUU2JThBJTk4JUU3JUIxJUJDJUU0JUI5JThCJUU5JUI4JTlE': 'search_bird.html', 
+                'JUU2JTk3JUEwJUU1JTk0JThEJUU0JUI5JThCJUU3JUJFJUJE': 'search_feather.html', 
+                'JUU3JTk2JTkxJUU4JUJEQTg=': 'search_books.html', 
+                'JUU3JUJEQUEJUU2JTgxJUI2JUU0JUI5JThCJUU4JThBJUIx': 'search_books.html', 
+                'JUU1JTg1JTg5JUU2JTk2JTg3JUU3JUE0JUJF': 'search_kobunsha.html', 
+                'JUU5JUJCJTkxJUU3JTk5JUJFJUU1JTkwJTg4JUU4JThBJUIxJUU4JUJDJUJB': 'search_blacklily.html', 
+                'JUU1JUFFJUFCJUU1JUI0JThFJUU1JUFFJTg5JUU1JUE1JTg4': 'search_anna.html', 
+                'JUU5JUJCJTkxJUU1JUI3JTlEJUU4JTkxJUI1': 'search_aoi.html' 
+            };
+
+            var _0xMatch = false;
+
+            // 动态解密比对
+            for (var _0xKey in _0xDict) {
+                try {
+                    var _0xDecoded = decodeURIComponent(atob(_0xKey));
+                    if (_0xQuery.indexOf(_0xDecoded) !== -1) {
+                        window.open(_0xDict[_0xKey], '_blank'); 
+                        _0xMatch = true;
+                        _0xError.style.display = 'none'; // 匹配成功隐藏报错
+                        break;
+                    }
+                } catch (e) {
+                    console.error("[SYS_ERR] Decryption Failed.");
+                }
+            }
+            
+            // 未找到结果处理 (页内提示)
+            if (!_0xMatch) {
+                // 过滤尖括号防止破坏页面结构
+                var safeQuery = _0xQuery.replace(/</g, "&lt;").replace(/>/g, "&gt;");
+                _0xError.innerHTML = '❌ <b>[系统提示]</b>：数据库中未检索到关于 "<strong>' + safeQuery + '</strong>" 的档案，请检查关键词。';
+                
+                // 每次触发重新赋予动画效果
+                _0xError.style.animation = 'none';
+                _0xError.offsetHeight; /* 触发重绘 */
+                _0xError.style.animation = 'shake 0.4s ease';
+                _0xError.style.display = 'block';
+            }
+        }
+
+        window.onload = function() {
+            var searchBox = document.getElementById('searchInput');
+            var errorMsg = document.getElementById('errorMsg');
+            
+            if (searchBox) {
+                // 监听回车事件
+                searchBox.addEventListener('keypress', function(e) {
+                    if (e.key === 'Enter') {
+                        executeSearch();
+                    }
+                });
+                
+                // 监听用户修改输入框（只要打字了，就隐藏报错框）
+                searchBox.addEventListener('input', function() {
+                    if (errorMsg.style.display === 'block') {
+                        errorMsg.style.display = 'none';
+                    }
+                });
+
+                searchBox.focus();
+            }
+        };
+    </script>
+
+</body>
+</html>

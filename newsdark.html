@@ -1,0 +1,282 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【速報】知名文豪黑川龙自杀案大反转 - TEITO NEWS</title>
+    <style>
+        /* ================= 基础重置与日系新闻门户风格 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body {
+            background-color: #f6f6f6;
+            color: #333333;
+            font-family: "Meiryo", "Hiragino Kaku Gothic ProN", "Microsoft YaHei", sans-serif;
+            line-height: 1.6;
+            /* 修复点：移除了 body 的 filter 和 animation，避免破坏 fixed 定位 */
+        }
+
+        a { color: #0044cc; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+
+        /* ================= 顶部导航栏 ================= */
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 3px solid #ff0033;
+            padding: 15px 0;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+        }
+        .nav-content {
+            width: 90%; max-width: 1000px; margin: 0 auto;
+            display: flex; justify-content: space-between; align-items: flex-end;
+        }
+        .logo {
+            font-size: 28px; font-weight: 900; color: #ff0033;
+            letter-spacing: -1px; font-style: italic;
+        }
+        .nav-links { font-size: 14px; font-weight: bold; display: flex; gap: 20px; }
+        .nav-links span { color: #666; cursor: pointer; }
+        .nav-links span:hover { color: #ff0033; }
+
+        /* ================= 主体内容区 ================= */
+        .container {
+            width: 90%; max-width: 1000px; margin: 25px auto;
+            display: flex; gap: 25px;
+            align-items: flex-start;
+        }
+
+        /* 左侧：新闻正文 */
+        .main-article {
+            background-color: #ffffff;
+            flex: 3;
+            padding: 40px;
+            border: 1px solid #e0e0e0;
+            border-radius: 4px;
+            box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+        }
+
+        .breadcrumb {
+            font-size: 12px; color: #666; margin-bottom: 20px;
+        }
+        .breadcrumb a { color: #666; }
+
+        .headline-wrapper {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #eeeeee;
+        }
+        .badge-breaking {
+            background-color: #ff0033; color: #ffffff;
+            font-size: 12px; font-weight: bold;
+            padding: 3px 8px; border-radius: 2px;
+            margin-right: 8px; vertical-align: middle;
+        }
+        .headline {
+            font-size: 26px; font-weight: bold; color: #111;
+            line-height: 1.4; margin-top: 10px;
+        }
+        
+        .meta-info {
+            display: flex; justify-content: space-between;
+            font-size: 13px; color: #888; margin-top: 15px;
+        }
+        .source-name { font-weight: bold; color: #333; }
+
+        /* 新闻正文排版 */
+        .article-body {
+            font-size: 16px; color: #222; margin-top: 30px;
+            text-align: justify; text-justify: inter-ideograph;
+        }
+        .article-body p { margin-bottom: 20px; }
+        .article-body strong { color: #000; }
+
+        /* 虚构的警方通报引用框 */
+        .police-quote {
+            background-color: #f8f9fa;
+            border-left: 4px solid #4a90e2;
+            padding: 15px 20px; margin: 25px 0;
+            font-size: 15px; color: #444;
+            font-family: "Noto Serif CJK SC", serif;
+        }
+
+        /* ================= 右侧：侧边栏 (增加真实感) ================= */
+        .sidebar {
+            flex: 1;
+            display: flex; flex-direction: column; gap: 20px;
+        }
+        
+        .widget {
+            background-color: #ffffff;
+            border: 1px solid #e0e0e0;
+            padding: 20px; border-radius: 4px;
+        }
+        .widget h3 {
+            font-size: 15px; font-weight: bold; color: #111;
+            border-bottom: 2px solid #111; padding-bottom: 10px; margin-bottom: 15px;
+        }
+        .trending-list {
+            list-style: none; font-size: 13px;
+        }
+        .trending-list li {
+            margin-bottom: 12px; padding-bottom: 12px;
+            border-bottom: 1px dotted #ccc;
+            line-height: 1.4;
+        }
+        .trending-list li:last-child { border-bottom: none; margin-bottom: 0; padding-bottom: 0; }
+        .trending-list li a { color: #333; }
+        .trending-list li a:hover { color: #0044cc; }
+        .rank-num {
+            display: inline-block; width: 18px; height: 18px;
+            background-color: #999; color: #fff; text-align: center;
+            line-height: 18px; font-size: 11px; font-weight: bold;
+            margin-right: 5px; border-radius: 2px;
+        }
+        .top-rank { background-color: #ff0033; }
+
+        /* 移动端适配 */
+        @media (max-width: 768px) {
+            .container { flex-direction: column; width: 95%; }
+            .main-article { padding: 20px; }
+            .headline { font-size: 22px; }
+        }
+
+        /* ================= 开场白场淡入特效 ================= */
+        #white-fade-overlay {
+            position: fixed;
+            inset: 0; /* 等同于 top:0; left:0; right:0; bottom:0; */
+            background-color: #ffffff;
+            z-index: 99998;
+            pointer-events: none;
+            animation: fadeOutWhite 2s ease-out forwards;
+        }
+        @keyframes fadeOutWhite {
+            0% { opacity: 1; }
+            100% { opacity: 0; }
+        }
+
+        /* ================= 终章转场：暗角向中心吞噬 ================= */
+        #vignette-overlay {
+            position: fixed;
+            inset: 0; /* 修复点：使用 inset 让其牢牢贴合视口边缘 */
+            pointer-events: none; 
+            z-index: 99999;
+            opacity: 0;
+        }
+
+        .darken-active {
+            opacity: 1 !important;
+            animation: vignetteToBlack 10s ease-in forwards;
+        }
+
+        /* 无论滚动条怎么滑，阴影永远从当前视口的四周向中心挤压 */
+        @keyframes vignetteToBlack {
+            0% {
+                box-shadow: inset 0 0 0 0 #000;
+                background-color: rgba(0, 0, 0, 0);
+            }
+            40% {
+                box-shadow: inset 0 0 30vmax 10vmax #000;
+                background-color: rgba(0, 0, 0, 0);
+            }
+            80% {
+                box-shadow: inset 0 0 60vmax 40vmax #000;
+                background-color: rgba(0, 0, 0, 0.7);
+            }
+            100% {
+                box-shadow: inset 0 0 100vmax 100vmax #000;
+                background-color: rgba(0, 0, 0, 1);
+            }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 开场白场淡入遮罩层 -->
+    <div id="white-fade-overlay"></div>
+
+    <!-- 结局转场黑幕遮罩层 -->
+    <div id="vignette-overlay"></div>
+
+    <!-- 伪造的新闻门户导航 -->
+    <div class="navbar">
+        <div class="nav-content">
+            <div class="logo">TEITO NEWS ONLINE</div>
+            <div class="nav-links">
+                <span>主要</span>
+                <span>国内</span>
+                <span style="color: #ff0033;">事件</span>
+                <span>社会</span>
+                <span>娱乐</span>
+            </div>
+        </div>
+    </div>
+
+    <div class="container">
+        <!-- 左侧：新闻正文区 -->
+        <div class="main-article">
+            <div class="breadcrumb">
+                <a href="#">ホーム</a> > <a href="#">ニュース</a> > <a href="#">国内</a> > <a href="#">事件</a>
+            </div>
+            
+            <div class="headline-wrapper">
+                <div class="headline">
+                    <span class="badge-breaking">速報</span>知名文豪黑川龙自杀案大反转：弟子伊藤健司与配偶黑川百合涉嫌谋杀被捕
+                </div>
+                <div class="meta-info">
+                    <div><span class="source-name">京都新闻网 / 共同社</span> 联合报道</div>
+                    <div>2026/6/25 (木) 10:45 配信</div>
+                </div>
+            </div>
+
+            <div class="article-body">
+                <p><strong>【东京·目黑区讯】</strong> 曾轰动日本文坛的“知名作家黑川龙书房自杀案”于今日上午迎来震撼性反转。据警视厅搜查一课证实，黑川龙的首席大弟子、青年畅销书作家<strong>伊藤健司</strong>（38岁），与其遗孀<strong>黑川百合</strong>（46岁），因涉嫌故意杀人罪及隐匿巨额财产罪，已于今日上午10时被警方正式逮捕。</p>
+
+                <p>令人骇然的是，逮捕行动发生于东京都某豪华酒店内——当时伊藤健司正准备召开黑川龙遗作《虚妄之冕》的全球新书发布会。现场聚集了上百家国内外媒体，大批警员的突然闯入及现场大屏幕的异常黑客入侵事件，导致会场一度陷入极度混乱。</p>
+
+                <div class="police-quote">
+                    “我们在今日凌晨接收到了来自匿名渠道的完整证据链，包括加密的原始音频文件及多份伪造法律文书。经刑侦技术科连夜比对，初步确认证据的真实性，遂立即实施了抓捕。”<br>
+                    <span style="display: block; text-align: right; margin-top: 10px; font-size: 13px;">—— 目黑警署刑事课发言人</span>
+                </div>
+
+                <p>据内部知情人士向本网独家透露，这份“匿名证据”中包含了案发当晚黑川宅邸书房内的<strong>关键性对话录音</strong>。录音清晰记录了嫌疑人伊藤健司利用钝器重击黑川龙头部，随后逃逸的骇人细节。</p>
+
+                <p>此外，警方还查获了一份尚未正式生效的《资产处置与版权转移全权委托书》草稿。该草稿显示，两名嫌疑人意图在遗嘱缺失的状态下，通过诱导次女放弃法定继承权，强行侵吞黑川龙名下所有已出版作品及遗作的版权收益，并密谋快速抛售案发房产以套取现金。</p>
+
+                <p>更深层的调查指出，黑川龙生前曾设立过一项高达数十亿日元的海外离岸信托基金。警方怀疑，这笔巨额隐匿资产正是引发这起伦理惨剧的核心动机。目前，两名嫌疑人对罪行表现出极度恐慌，审讯工作正在深入推进中。</p>
+            </div>
+        </div>
+
+        <!-- 右侧：热搜榜单 -->
+        <div class="sidebar">
+            <div class="widget">
+                <h3>アクセスランキング（事件）</h3>
+                <ul class="trending-list">
+                    <li><span class="rank-num top-rank">1</span><a href="#">【现场视频】新书发布会突变逮捕现场，大屏幕突发诡异红字</a></li>
+                    <li><span class="rank-num top-rank">2</span><a href="#">伊藤健司被捕时面如死灰，警方缴获沾血样书证物</a></li>
+                    <li><span class="rank-num top-rank">3</span><a href="#">黑川龙遗作《虚妄之冕》实为剽窃？出版方紧急宣布全线下架</a></li>
+                    <li><span class="rank-num">4</span><a href="#">20亿海外信托去向成谜，天才作家生前早有防备？</a></li>
+                    <li><span class="rank-num">5</span><a href="#">法医将重新尸检黑川龙遗体，揭秘文坛最黑暗的一夜</a></li>
+                    <li><span class="rank-num">6</span><a href="#">次女黑川雪去向不明，疑似“匿名证据”提供者</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 页面逻辑：给玩家 10 秒时间阅读新闻，然后启动转场
+        setTimeout(() => {
+            const overlay = document.getElementById('vignette-overlay');
+            
+            // 启动时长为 10 秒的“暗角吞噬”动画
+            overlay.classList.add('darken-active');
+
+            // 动画播放完毕后（即 10 秒 + 10 秒 = 第 20 秒时），执行无缝跳转
+            setTimeout(() => {
+                window.location.href = 'end.html';
+            }, 20000); 
+
+        }, 10000); 
+    </script>
+</body>
+</html>

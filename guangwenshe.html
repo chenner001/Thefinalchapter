@@ -1,0 +1,306 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>光文社 (KOBUNSHA) - 官方网站</title>
+    <style>
+        /* ================= 全局重置与排版 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            font-family: "Noto Serif SC", "SimSun", "Times New Roman", serif; /* 出版社典型的文学衬线体 */
+            color: #333;
+            background-color: #fafafa;
+            line-height: 1.6;
+        }
+        a { text-decoration: none; color: inherit; }
+        
+        /* ================= 顶部导航栏 ================= */
+        .navbar {
+            background-color: #ffffff;
+            border-bottom: 1px solid #eaeaea;
+            padding: 20px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: sticky;
+            top: 0;
+            z-index: 100;
+            box-shadow: 0 2px 10px rgba(0,0,0,0.02);
+        }
+        .nav-logo {
+            font-size: 28px;
+            font-weight: 900;
+            letter-spacing: 4px;
+            color: #b30000; /* 传统的暗红色 */
+            display: flex;
+            align-items: center;
+        }
+        .nav-logo span {
+            font-size: 14px;
+            color: #888;
+            letter-spacing: 1px;
+            margin-left: 10px;
+            font-weight: normal;
+            font-family: sans-serif;
+        }
+        .nav-links {
+            display: flex;
+            gap: 30px;
+            font-size: 15px;
+            font-weight: bold;
+        }
+        .nav-links a:hover { color: #b30000; }
+
+        /* ================= 巨幅悼念 Banner (符合当前时间线) ================= */
+        .hero-banner {
+            background-color: #111;
+            color: #fff;
+            padding: 80px 10%;
+            text-align: center;
+            border-bottom: 5px solid #b30000;
+            position: relative;
+            overflow: hidden;
+        }
+        /* 增加一点水墨材质感 */
+        .hero-banner::before {
+            content: '';
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: radial-gradient(circle, rgba(255,255,255,0.05) 0%, rgba(0,0,0,0) 70%);
+            pointer-events: none;
+        }
+        .hero-subtitle { font-size: 16px; color: #aaa; letter-spacing: 8px; margin-bottom: 20px; }
+        .hero-title { font-size: 42px; font-weight: normal; letter-spacing: 6px; margin-bottom: 30px; }
+        .hero-desc { font-size: 16px; color: #ccc; max-width: 600px; margin: 0 auto; line-height: 2; text-align: justify; }
+
+        /* ================= 主体内容区 ================= */
+        .container {
+            max-width: 1200px;
+            margin: 0 auto;
+            padding: 60px 20px;
+            display: grid;
+            grid-template-columns: 2fr 1fr;
+            gap: 50px;
+        }
+
+        /* 左侧：企业公告 */
+        .news-section .section-title {
+            font-size: 24px;
+            border-bottom: 2px solid #111;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .news-list { list-style: none; }
+        .news-item {
+            padding: 20px 0;
+            border-bottom: 1px dashed #ddd;
+            display: flex;
+            gap: 20px;
+        }
+        .news-date {
+            font-family: sans-serif;
+            font-size: 14px;
+            color: #888;
+            flex-shrink: 0;
+            width: 100px;
+        }
+        .news-title { font-size: 16px; font-weight: bold; margin-bottom: 8px; }
+        .news-title:hover { color: #b30000; cursor: pointer; }
+        .news-summary { font-size: 14px; color: #666; text-align: justify; }
+
+        /* 右侧：重点图书推荐 */
+        .sidebar .section-title {
+            font-size: 20px;
+            border-bottom: 2px solid #b30000;
+            padding-bottom: 10px;
+            margin-bottom: 30px;
+        }
+        .book-card {
+            background: #fff;
+            border: 1px solid #eaeaea;
+            padding: 20px;
+            text-align: center;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            margin-bottom: 30px;
+        }
+        .book-cover {
+            width: 120px;
+            height: 170px;
+            background: #2c3e50;
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #fff;
+            font-size: 20px;
+            letter-spacing: 4px;
+            writing-mode: vertical-rl;
+            border-right: 4px solid #fff;
+            box-shadow: -5px 5px 10px rgba(0,0,0,0.1);
+        }
+        .book-title { font-weight: bold; font-size: 16px; margin-bottom: 5px; }
+        .book-author { font-size: 13px; color: #888; }
+
+        /* ================= 底部版权区 (重点：隐藏入口所在处) ================= */
+        .site-footer {
+            background-color: #1a1a1a;
+            color: #777;
+            padding: 40px 10%;
+            font-family: sans-serif;
+            font-size: 13px;
+        }
+        .footer-content {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 20px;
+        }
+        .footer-links a { margin-right: 20px; transition: color 0.2s; }
+        .footer-links a:hover { color: #fff; }
+
+        .footer-bottom {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        /* ----------------------------------------------------
+           【员工内网 / 匿名论坛入口】
+           伪装成普通的底层运维系统入口，但在悬停时会暴露其匿名特征
+           ---------------------------------------------------- */
+        .secret-entry {
+            color: #444; /* 故意调暗，融入背景 */
+            text-transform: uppercase;
+            letter-spacing: 1px;
+            position: relative;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .secret-entry:hover {
+            color: #ff3333;
+            text-shadow: 0 0 8px rgba(255, 51, 51, 0.4);
+        }
+
+        /* 利用伪元素在悬停时改变文字，提示玩家 */
+        .secret-entry::after {
+            content: ' [内部匿名通道]';
+            position: absolute;
+            left: 100%;
+            top: 0;
+            white-space: nowrap;
+            opacity: 0;
+            transform: translateX(-10px);
+            transition: all 0.3s;
+        }
+
+        .secret-entry:hover::after {
+            opacity: 1;
+            transform: translateX(5px);
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 导航栏 -->
+    <header class="navbar">
+        <div class="nav-logo">光文社 <span>KOBUNSHA PUBLISHING</span></div>
+        <div class="nav-links">
+            <a href="#">首页</a>
+            <a href="#">旗下作家</a>
+            <a href="#">新书速递</a>
+            <a href="#">文学奖项</a>
+            <a href="#">关于我们</a>
+        </div>
+    </header>
+
+    <!-- 巨幅悼念 (符合游戏第一章的时间线) -->
+    <section class="hero-banner">
+        <div class="hero-subtitle">巨星陨落，墨香永存</div>
+        <h1 class="hero-title">沉痛悼念 黑川龙 先生 (1966-2026)</h1>
+        <div class="hero-desc">
+            日本推理小说泰斗、国家文学最高奖项得主，我社最珍贵的签约作家黑川龙先生，于2026年6月19日不幸离世。
+            黑川老师的离去是日本乃至世界文学界的巨大损失。光文社全员致以最深切的哀悼。
+        </div>
+    </section>
+
+    <!-- 主体内容 -->
+    <main class="container">
+        
+        <!-- 左侧：公司公告栏 (暗藏剧情伏笔) -->
+        <div class="news-section">
+            <h2 class="section-title">企业公告 & 媒体动态</h2>
+            <ul class="news-list">
+                <li class="news-item">
+                    <div class="news-date">2026.06.23</div>
+                    <div>
+                        <div class="news-title">关于黑川龙先生遗稿整理工作的官方声明</div>
+                        <div class="news-summary">光文社在此郑重声明，将倾尽全力整理黑川老师生前遗稿。经家属同意，遗稿的校对与补全工作将由黑川老师生前首席弟子、青年作家伊藤健司先生全权协助执行。</div>
+                    </div>
+                </li>
+                <li class="news-item">
+                    <div class="news-date">2026.06.21</div>
+                    <div>
+                        <div class="news-title">【讣告】沉痛送别黑川龙先生</div>
+                        <div class="news-summary">黑川龙先生追悼会将于6月23日在东京青山殡仪馆举行。谢绝一切未经邀约的媒体采访。</div>
+                    </div>
+                </li>
+                <li class="news-item">
+                    <div class="news-date">2026.06.01</div>
+                    <div>
+                        <div class="news-title">光文社夏季推理大赏 最终入围名单揭晓</div>
+                        <div class="news-summary">旨在发掘次时代推理新星的光文社夏季大赏，今日公布了十部最终候选作品。颁奖典礼原定由黑川龙先生担任主审委...</div>
+                    </div>
+                </li>
+            </ul>
+        </div>
+
+        <!-- 右侧：侧边栏 -->
+        <aside class="sidebar">
+            <h2 class="section-title">传世之作</h2>
+            
+            <div class="book-card">
+                <div class="book-cover" style="background-color: #1a1a1a;">暗夜杀机</div>
+                <div class="book-title">《暗夜杀机》 典藏版</div>
+                <div class="book-author">作者：黑川龙</div>
+                <p style="font-size: 12px; color: #999; margin-top: 10px;">累计销量突破一千万册</p>
+            </div>
+
+            <div class="book-card">
+                <div class="book-cover" style="background-color: #8b0000;">罪恶之花</div>
+                <div class="book-title">《罪恶之花》</div>
+                <div class="book-author">作者：黑川龙</div>
+                <p style="font-size: 12px; color: #999; margin-top: 10px;">登顶霸榜长达 50 周</p>
+            </div>
+        </aside>
+
+    </main>
+
+    <!-- 底部版权栏 -->
+    <footer class="site-footer">
+        <div class="footer-content">
+            <div class="footer-links">
+                <a href="#">隐私政策</a>
+                <a href="#">使用条款</a>
+                <a href="#">招贤纳士</a>
+                <a href="#">投资者关系</a>
+                <a href="#">联系我们</a>
+            </div>
+            <div>
+                <!-- 在新标签页打开 匿名.html -->
+                <!-- 这个按钮伪装成灰暗颜色的内网入口，玩家悬停时会有反馈 -->
+                <a href="kobunsha_login.html" target="_blank" class="secret-entry">Staff Intranet Gateway</a>
+            </div>
+        </div>
+        <div class="footer-bottom">
+            <span>&copy; 2026 光文社 KOBUNSHA PUBLISHING CO., LTD. All Rights Reserved.</span>
+            <span>东京本社：东京都千代田区神田神保町 X-X-X</span>
+        </div>
+    </footer>
+
+</body>
+</html>

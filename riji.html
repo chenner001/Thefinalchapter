@@ -1,0 +1,331 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>私密日记 · 伊藤健司</title>
+    <style>
+        /* ================= 基础重置 ================= */
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #000000; /* 全局底色设为黑，防止边缘穿帮 */
+            font-family: "Noto Serif SC", "SimSun", serif;
+            overflow-x: hidden;
+            user-select: none;
+            scrollbar-width: none;
+        }
+        ::-webkit-scrollbar { display: none; }
+
+        /* ================= 第一幕：核心崩坏区 ================= */
+        .scroll-track {
+            height: 500vh; /* 专属滚动轨道 */
+            position: relative;
+            z-index: 10;
+        }
+
+        .sticky-stage {
+            position: sticky;
+            top: 0;
+            height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: #ffffff; /* JS会控制它渐变成黑色 */
+            overflow: hidden;
+        }
+
+        .diary-paper {
+            background: #ffffff;
+            border: 1px solid #eaeaea;
+            box-shadow: 0 10px 30px rgba(0,0,0,0.05);
+            padding: 50px 60px;
+            width: 80%;
+            max-width: 650px;
+            text-align: left;
+            z-index: 10;
+            transition: transform 0.1s, opacity 0.1s, box-shadow 0.2s, background 0.2s;
+        }
+
+        .diary-title {
+            font-size: 26px;
+            color: #111111;
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #dddddd;
+            font-weight: bold;
+        }
+
+        .diary-text { font-size: 18px; color: #333333; line-height: 2; }
+
+        .scroll-hint {
+            position: absolute;
+            bottom: 30px;
+            font-size: 12px;
+            color: #aaaaaa;
+            letter-spacing: 4px;
+            font-family: sans-serif;
+            animation: pulse 2s infinite;
+        }
+        @keyframes pulse { 0%, 100% { opacity: 0.3; } 50% { opacity: 1; } }
+
+        /* 故障变红效果 */
+        .glitch-paper {
+            background: transparent !important;
+            border-color: #cc0000 !important;
+            box-shadow: 0 0 30px rgba(204, 0, 0, 0.5) !important;
+        }
+        .glitch-text {
+            color: #cc0000 !important;
+            font-weight: bold;
+            text-shadow: 3px 0 0 rgba(255,0,0,0.7), -3px 0 0 rgba(0,0,255,0.7);
+            animation: glitch-skew 0.2s infinite;
+        }
+        @keyframes glitch-skew {
+            0% { transform: skew(0deg) translate(0, 0); }
+            20% { transform: skew(-10deg) translate(-2px, 2px); }
+            40% { transform: skew(10deg) translate(2px, -2px); }
+            60% { transform: skew(0deg) translate(-2px, -2px); }
+            80% { transform: skew(-5deg) translate(2px, 2px); }
+            100% { transform: skew(0deg) translate(0, 0); }
+        }
+
+        /* 底层血红真相 */
+        .truth-layer {
+            position: absolute;
+            width: 100%; height: 100%;
+            pointer-events: none;
+            z-index: 20;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            text-align: center;
+            color: #cc0000;
+            text-shadow: 0 0 15px rgba(255, 0, 0, 0.8);
+            font-weight: 900;
+        }
+        .truth-line {
+            position: absolute;
+            opacity: 0;
+            transform: scale(0.8);
+            width: 90%;
+        }
+        .t1 { font-size: 40px; top: 35%; letter-spacing: 5px; }
+        .t2 { font-size: 46px; top: 45%; line-height: 1.5; letter-spacing: 2px; }
+        .t3 { font-size: 52px; top: 60%; line-height: 1.6; }
+
+        .shake-hard { animation: shake 0.1s infinite; }
+        @keyframes shake {
+            0% { transform: translate(3px, 2px) rotate(0deg) scale(1.1); }
+            50% { transform: translate(-2px, 3px) rotate(-1deg) scale(1.1); }
+            100% { transform: translate(-3px, -2px) rotate(1deg) scale(1.1); }
+        }
+
+        /* 瀑布流背景 */
+        .waterfall-bg {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 5;
+            opacity: 0;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: space-around;
+            background: #030000;
+        }
+        .marquee {
+            white-space: nowrap;
+            font-size: 70px;
+            font-weight: 900;
+            color: rgba(204, 0, 0, 0.15);
+            animation: scroll-left 3s linear infinite;
+        }
+        .marquee.reverse { animation-direction: reverse; animation-duration: 2.5s; color: rgba(255, 0, 0, 0.2); }
+        @keyframes scroll-left { 0% { transform: translateX(100%); } 100% { transform: translateX(-100%); } }
+
+        /* ================= 第二幕：巨型无缝渐变大图 ================= */
+        /* 黑 -> 白 -> 黑 的过渡，保证上下边缘都是纯黑，与前后无缝融合 */
+        .massive-gradient {
+            height: 200vh;
+            width: 100%;
+            background: linear-gradient(to bottom, #000000 0%, #ffffff 50%, #000000 100%);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            z-index: 5;
+        }
+
+        .transition-label {
+            font-size: 14px;
+            letter-spacing: 12px;
+            color: #555;
+            text-transform: uppercase;
+            background: rgba(0,0,0,0.03);
+            padding: 15px 40px;
+            border-radius: 40px;
+            backdrop-filter: blur(5px);
+            border: 1px solid rgba(0,0,0,0.05);
+            font-family: "Arial", sans-serif;
+            pointer-events: none;
+        }
+
+        /* ================= 第三幕：底部深渊区 ================= */
+        .scroll-fill {
+            height: 100vh;
+            background-color: #000000;
+            position: relative;
+            z-index: 5;
+        }
+
+        /* 小屏适配 */
+        @media (max-width: 600px) {
+            .diary-paper { padding: 30px 25px; }
+            .diary-title { font-size: 20px; }
+            .diary-text { font-size: 16px; }
+            .truth-line { font-size: 30px !important; }
+            .t1 { font-size: 28px !important; }
+            .t2 { font-size: 32px !important; }
+            .t3 { font-size: 36px !important; }
+            .marquee { font-size: 40px; }
+        }
+    </style>
+</head>
+<body>
+
+    <div class="scroll-track" id="mainTrack">
+        <div class="sticky-stage" id="stage">
+            
+            <div class="waterfall-bg" id="waterfall">
+                <div class="marquee">凭什么他在台上享受掌声 都是我写的 都是我写的</div>
+                <div class="marquee reverse">放屁！放屁！把人生还给我！老鼠！</div>
+                <div class="marquee">像老鼠一样待在地下室 凭什么是我</div>
+                <div class="marquee reverse">替他写了十九年 他连笔都拿不稳了</div>
+                <div class="marquee">《疑轨》是我写的 《罪恶之花》是我写的</div>
+            </div>
+
+            <div class="diary-paper" id="diary">
+                <div class="diary-title" id="d-title">《看不见的积木》</div>
+                <div class="diary-text" id="d-text">
+每天晚上11点零4分，隔壁空置了半年的阁楼里，都会准时传出清脆的木块撞击声。那节奏不急不缓，像是有个极具耐心的孩子，在黑暗中搭建着一座看不见的城堡。<br>
+
+身为声音架构师的鈴木翔太忍无可忍，终于在第六天深夜，带着专业收音设备撬开了那扇落满灰尘的门。手电筒的光柱划破死寂，房间里除了一张盖着白布的旧沙发，空无一物。可就在他屏住呼吸的瞬间，耳机里那规律的“啪嗒、啪嗒”声却突然在距离他耳膜仅有三公分的地方爆裂开来。<br>
+
+鈴木翔太浑身冰冷。他颤抖着按下音频逆向解密程序，将波形图强行拉回真实频段——那根本不是堆叠积木的脆响。<br>
+
+那是有人被悬挂在房梁上，临死前，双脚鞋底日复一日、绝望地踢击着高背椅靠背的沉闷撞击声。而音频的源头，正顺着天花板的裂缝，一点点渗透进鈴木翔太自己的卧室。
+                </div>
+            </div>
+
+            <div class="truth-layer">
+                <div class="truth-line t1" id="t1">“放屁！都是我写的！”</div>
+                <div class="truth-line t2" id="t2">“《疑轨》是我写的！<br>《罪恶之花》是我写的！”</div>
+                <div class="truth-line t3" id="t3">“我已经替他写了十九年！<br>他连笔都拿不稳了，<br>凭什么他在台上享受掌声，<br>我只能像老鼠一样待在地下室？！”</div>
+            </div>
+
+        </div>
+    </div>
+
+    <div class="scroll-fill">
+        <div class="waterfall-bg" style="opacity: 1 !important;">
+            <div class="marquee">凭什么他在台上享受掌声 都是我写的 都是我写的</div>
+            <div class="marquee reverse">放屁！放屁！把人生还给我！老鼠！</div>
+            <div class="marquee">像老鼠一样待在地下室 凭什么是我</div>
+            <div class="marquee reverse">替他写了十九年 他连笔都拿不稳了</div>
+            <div class="marquee">《疑轨》是我写的 《罪恶之花》是我写的</div>
+        </div>
+    </div>
+
+    <script>
+        (function() {
+            window.addEventListener('scroll', function() {
+                // 【核心修复】：进度 p 仅相对于第一幕轨道 (scroll-track) 计算
+                const track = document.getElementById('mainTrack');
+                // maxScroll 是第一幕可以滚动的总有效距离
+                const maxScroll = track.offsetHeight - window.innerHeight;
+                // scrollY 就是当前滚动高度（因为 track 在最顶端）
+                let p = window.scrollY / maxScroll; 
+                
+                // 限制 p 的范围，确保出圈后动画依然维持最终状态
+                if (p < 0) p = 0; 
+                if (p > 1) p = 1;
+
+                const stage = document.getElementById('stage');
+                const diary = document.getElementById('diary');
+                const dTitle = document.getElementById('d-title');
+                const dText = document.getElementById('d-text');
+                const t1 = document.getElementById('t1');
+                const t2 = document.getElementById('t2');
+                const t3 = document.getElementById('t3');
+                const waterfall = document.getElementById('waterfall');
+                const hint = document.getElementById('hint');
+
+                hint.style.opacity = p > 0.02 ? 0 : 1;
+
+                // ---- 第一阶段：白色日记崩坏变黑 ----
+                if (p > 0.1 && p <= 0.35) {
+                    diary.classList.add('glitch-paper');
+                    dTitle.classList.add('glitch-text');
+                    dText.classList.add('glitch-text');
+                    
+                    let colorVal = Math.floor(255 - ((p - 0.1) * 4 * 255));
+                    if (colorVal < 0) colorVal = 0;
+                    stage.style.backgroundColor = `rgb(${colorVal}, ${colorVal}, ${colorVal})`;
+                    
+                    diary.style.transform = `scale(${1 + (p - 0.1)}) rotate(${(p - 0.1) * 20}deg)`;
+                    let diaryOpacity = 1 - ((p - 0.25) * 10);
+                    diary.style.opacity = diaryOpacity < 0 ? 0 : (diaryOpacity > 1 ? 1 : diaryOpacity);
+                    
+                } else if (p <= 0.1) {
+                    diary.classList.remove('glitch-paper');
+                    dTitle.classList.remove('glitch-text');
+                    dText.classList.remove('glitch-text');
+                    stage.style.backgroundColor = '#ffffff';
+                    diary.style.opacity = 1;
+                    diary.style.transform = 'scale(1) rotate(0deg)';
+                } else {
+                    diary.style.opacity = 0;
+                    stage.style.backgroundColor = '#000000'; // 关键：第一幕最终底色是纯黑
+                }
+
+                // ---- 第二阶段：红字浮现 ----
+                if (p > 0.35 && p <= 0.55) {
+                    t1.style.opacity = (p - 0.35) * 5;
+                    t1.style.transform = `scale(${0.8 + (p - 0.35) * 1.5})`;
+                } else if (p <= 0.35) { t1.style.opacity = 0; } 
+                else { t1.style.opacity = 1; t1.style.transform = `scale(1.1)`; }
+
+                if (p > 0.5 && p <= 0.7) {
+                    t2.style.opacity = (p - 0.5) * 5;
+                    t2.style.transform = `scale(${0.8 + (p - 0.5) * 1.5})`;
+                } else if (p <= 0.5) { t2.style.opacity = 0; } 
+                else { t2.style.opacity = 1; t2.style.transform = `scale(1.1)`; }
+
+                if (p > 0.65 && p <= 0.85) {
+                    t3.style.opacity = (p - 0.65) * 5;
+                    t3.style.transform = `scale(${0.8 + (p - 0.65) * 1.5})`;
+                    t3.classList.remove('shake-hard');
+                    waterfall.style.opacity = 0;
+                } else if (p <= 0.65) { t3.style.opacity = 0; }
+
+                // ---- 第三阶段：瀑布流极致高潮 ----
+                // 当 p 大于 0.85 时，包括超出第一幕区域 (p = 1) 时，状态保持狂暴锁定
+                if (p > 0.85) {
+                    t1.style.opacity = 0; 
+                    t2.style.opacity = 0;
+                    t3.style.opacity = 1; // 必须加上这句，确保快速滚动不会丢失
+                    t3.style.transform = `scale(1.1)`;
+                    t3.classList.add('shake-hard');
+                    
+                    let wfOpacity = (p - 0.85) * 6;
+                    waterfall.style.opacity = wfOpacity > 0.9 ? 0.9 : wfOpacity;
+                }
+            });
+
+            // 初始触发一次，防止页面刷新后状态错误
+            window.dispatchEvent(new Event('scroll'));
+        })();
+    </script>
+</body>
+</html>
