@@ -132,7 +132,7 @@
         
         /* 下拉面板 */
         .history-menu {
-            display: none; /* 默认隐藏 */
+            display: none;
             position: absolute;
             right: 0;
             top: 100%;
@@ -146,7 +146,6 @@
             z-index: 101;
             text-align: left;
         }
-        /* 悬停按钮时显示下拉面板 */
         .history-dropdown:hover .history-menu {
             display: block;
             animation: fadeInMenu 0.2s ease forwards;
@@ -186,7 +185,6 @@
         .history-text {
             color: #3c4043;
         }
-        /* -------------------------------- */
 
         /* 搜索 Logo */
         .search-logo {
@@ -225,7 +223,6 @@
             border-color: rgba(223, 225, 229, 0);
         }
         
-        /* 放大镜图标 */
         .search-icon {
             position: absolute;
             left: 15px;
@@ -257,7 +254,7 @@
             color: #202124;
         }
 
-        /* --- 新增：页内未找到结果报错框 --- */
+        /* --- 页内未找到结果/锁定报错框 --- */
         .error-msg {
             display: none;
             margin-top: 25px;
@@ -311,15 +308,14 @@
                     </button>
                     <div class="history-menu">
                         <div class="history-header">近期搜索与访问</div>
-                        
                         <a href="police_bulletin.html" target="_blank" class="history-item">
-                            <span class="history-icon"></span>
+                            <span class="history-icon">📄</span>
                             <span class="history-text">关于东京都目黑区居民黑川龙身亡事件的调查情况通报</span>
                         </a>
-                        
                     </div>
                 </div>
             </div>
+
             <div class="search-logo">
                 <span>S</span><span>e</span><span>a</span><span>r</span><span>c</span><span>h</span>
             </div>
@@ -343,7 +339,7 @@
         /**
          * [SECURE NETWORK SCRIPT]
          * System: Kurokawa Terminal
-         * Encryption: Base64 + URI Component Padding
+         * Encryption: Base64 + Storage Lock
          */
         function executeSearch() {
             var _0xInput = document.getElementById('searchInput');
@@ -356,7 +352,32 @@
                 return;
             }
 
-            // 字典加密
+            // 1. 获取解密后的通关密钥词汇（防源码偷看）："伊藤健司"
+            var _0xTargetKey = decodeURIComponent(atob('JUU0JUJDJThBJUU4JTk3JUE0JUU1JTgxJUE1JUU1JThGJUI4'));
+            
+            // 2. 检查本地进度锁
+            var _0xIsUnlocked = localStorage.getItem('sys_search_unlocked') === 'true';
+
+            // 3. 校验玩家是否正在解开进度锁
+            if (_0xQuery.indexOf(_0xTargetKey) !== -1) {
+                // 解锁成功，记忆保存到浏览器
+                localStorage.setItem('sys_search_unlocked', 'true');
+                _0xIsUnlocked = true;
+            }
+
+            // 4. 如果未解锁，拦截所有搜索请求，抛出专属报错
+            if (!_0xIsUnlocked) {
+                _0xError.innerHTML = '❌ <b>[系统提示]</b>：父亲口中的我最想撕毁的名字到底是谁...';
+                
+                // 每次触发重新赋予震动效果
+                _0xError.style.animation = 'none';
+                _0xError.offsetHeight; /* 触发重绘 */
+                _0xError.style.animation = 'shake 0.4s ease';
+                _0xError.style.display = 'block';
+                return; // 终止执行，不进入下方搜索逻辑
+            }
+
+            // 5. 字典加密：若已解锁，执行正常搜索匹配
             var _0xDict = {
                 'JUU5JUJCJTkxJUU1JUI3JTlEJUU5JUJFJTk5': 'search_kurokawa.html', 
                 'JUU0JUJDJThBJUU4JTk3JUE0JUU1JTgxJUE1JUU1JThGJUI4': 'search_yiteng.html', 
@@ -372,7 +393,6 @@
 
             var _0xMatch = false;
 
-            // 动态解密比对
             for (var _0xKey in _0xDict) {
                 try {
                     var _0xDecoded = decodeURIComponent(atob(_0xKey));
@@ -387,15 +407,13 @@
                 }
             }
             
-            // 未找到结果处理 (页内提示)
+            // 如果已解锁，但输入的内容不在字典里，提示常规的未找到
             if (!_0xMatch) {
-                // 过滤尖括号防止破坏页面结构
                 var safeQuery = _0xQuery.replace(/</g, "&lt;").replace(/>/g, "&gt;");
                 _0xError.innerHTML = '❌ <b>[系统提示]</b>：数据库中未检索到关于 "<strong>' + safeQuery + '</strong>" 的档案，请检查关键词。';
                 
-                // 每次触发重新赋予动画效果
                 _0xError.style.animation = 'none';
-                _0xError.offsetHeight; /* 触发重绘 */
+                _0xError.offsetHeight; 
                 _0xError.style.animation = 'shake 0.4s ease';
                 _0xError.style.display = 'block';
             }
