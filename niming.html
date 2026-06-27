@@ -1,0 +1,459 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>匿名职场社区 - 光文社内部讨论</title>
+    <style>
+        /* ================= 基础与全局设定 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #f0f2f5; /* 经典的桌面端浅灰背景 */
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+            color: #1a1a1a;
+            overflow-y: scroll;
+        }
+
+        /* ================= 桌面端顶栏 ================= */
+        .desktop-header {
+            width: 100%;
+            background-color: #ffffff;
+            height: 64px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.05);
+            position: sticky;
+            top: 0;
+            z-index: 100;
+        }
+        .header-content {
+            width: 100%;
+            max-width: 1200px;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+        }
+        .app-logo {
+            font-size: 24px;
+            font-weight: 900;
+            color: #0066ff;
+            letter-spacing: -0.5px;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .app-logo::after {
+            content: 'Web';
+            font-size: 12px;
+            background: #e6f0ff;
+            padding: 2px 6px;
+            border-radius: 4px;
+            font-weight: 600;
+        }
+        .search-bar {
+            background-color: #f0f2f5;
+            border-radius: 8px;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            width: 400px;
+            border: 1px solid transparent;
+            transition: border-color 0.2s;
+        }
+        .search-bar:focus-within {
+            border-color: #0066ff;
+            background-color: #fff;
+        }
+        .search-bar input {
+            border: none;
+            background: transparent;
+            outline: none;
+            font-size: 15px;
+            color: #333;
+            width: 100%;
+            font-weight: 500;
+        }
+        .search-bar::before {
+            content: '🔍';
+            font-size: 16px;
+            margin-right: 12px;
+            opacity: 0.5;
+        }
+        .user-actions {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            font-size: 15px;
+            color: #444;
+            font-weight: 500;
+        }
+        .write-btn {
+            background: #0066ff;
+            color: white;
+            padding: 8px 20px;
+            border-radius: 20px;
+            cursor: pointer;
+        }
+
+        /* ================= 三栏式主体布局 ================= */
+        .layout-container {
+            width: 100%;
+            max-width: 1200px;
+            margin: 24px auto;
+            display: grid;
+            grid-template-columns: 240px 1fr 300px;
+            gap: 24px;
+            padding: 0 20px;
+        }
+
+        /* 1. 左侧导航栏 */
+        .sidebar-left {
+            display: flex;
+            flex-direction: column;
+            gap: 8px;
+        }
+        .nav-menu {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 16px 0;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+        }
+        .nav-item {
+            padding: 12px 24px;
+            font-size: 15px;
+            color: #4b5563;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            cursor: pointer;
+            transition: background 0.2s;
+        }
+        .nav-item:hover { background: #f9fafb; }
+        .nav-item.active {
+            background: #e6f0ff;
+            color: #0066ff;
+            font-weight: 600;
+            border-right: 3px solid #0066ff;
+        }
+
+        /* 2. 中间帖子主体 */
+        .main-feed {
+            background: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            overflow: hidden;
+        }
+        .post-header {
+            padding: 24px 30px;
+            border-bottom: 1px solid #f0f2f5;
+        }
+        .post-title {
+            font-size: 22px;
+            font-weight: bold;
+            line-height: 1.5;
+            margin-bottom: 16px;
+            color: #111827;
+        }
+        .post-tags span {
+            display: inline-block;
+            background: #f3f4f6;
+            color: #4b5563;
+            font-size: 13px;
+            padding: 6px 12px;
+            border-radius: 6px;
+            margin-right: 10px;
+            cursor: pointer;
+        }
+        .post-tags span:hover { background: #e5e7eb; }
+        .post-tags span.active { background: #e6f0ff; color: #0066ff; }
+
+        /* 评论区 */
+        .comment {
+            display: flex;
+            padding: 24px 30px;
+            border-bottom: 1px solid #f9fafb;
+        }
+        .avatar {
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 24px;
+            margin-right: 16px;
+            flex-shrink: 0;
+        }
+        .bg-penguin { background-color: #e0f2fe; }
+        .bg-shiba { background-color: #fef08a; }
+        .bg-crow { background-color: #e5e7eb; }
+
+        .comment-content { flex: 1; }
+        .comment-meta {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 8px;
+        }
+        .user-info {
+            font-size: 15px;
+            font-weight: 600;
+            color: #111827;
+            display: flex;
+            align-items: center;
+        }
+        .auth-tag {
+            font-size: 12px;
+            color: #10b981;
+            background: #d1fae5;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            margin-left: 10px;
+        }
+        .time-ago { font-size: 13px; color: #9ca3af; }
+        
+        .comment-text {
+            font-size: 16px;
+            color: #374151;
+            line-height: 1.6;
+            margin-bottom: 16px;
+        }
+
+        .comment-actions {
+            display: flex;
+            gap: 24px;
+            font-size: 13px;
+            color: #6b7280;
+            font-weight: 500;
+        }
+        .action-btn { cursor: pointer; display: flex; align-items: center; }
+        .action-btn:hover { color: #0066ff; }
+        .action-btn span { margin-left: 6px; }
+
+        /* 附件区 (录音文件) */
+        .attachment-card {
+            background: #f8fafc;
+            border: 1px solid #cbd5e1;
+            border-radius: 8px;
+            padding: 16px 20px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.2s;
+            width: 100%;
+            max-width: 400px;
+        }
+        .attachment-card:hover {
+            border-color: #0066ff;
+            background: #eff6ff;
+            box-shadow: 0 4px 12px rgba(0, 102, 255, 0.1);
+        }
+        .file-icon {
+            width: 40px;
+            height: 40px;
+            background: #0066ff;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-size: 18px;
+            margin-right: 16px;
+            animation: soft-pulse 2s infinite;
+        }
+        .file-info { flex: 1; }
+        .file-name { font-size: 15px; font-weight: bold; color: #0f172a; margin-bottom: 4px; }
+        .file-size { font-size: 13px; color: #64748b; }
+
+        @keyframes soft-pulse {
+            0% { box-shadow: 0 0 0 0 rgba(0, 102, 255, 0.4); }
+            70% { box-shadow: 0 0 0 8px rgba(0, 102, 255, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(0, 102, 255, 0); }
+        }
+
+        /* 3. 右侧信息栏 (热榜) */
+        .sidebar-right {
+            background: #ffffff;
+            border-radius: 12px;
+            padding: 20px;
+            box-shadow: 0 2px 8px rgba(0,0,0,0.04);
+            height: fit-content;
+        }
+        .widget-title {
+            font-size: 16px;
+            font-weight: bold;
+            color: #111827;
+            margin-bottom: 16px;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+        .trend-list { list-style: none; }
+        .trend-item {
+            padding: 12px 0;
+            border-bottom: 1px dashed #f0f2f5;
+            cursor: pointer;
+        }
+        .trend-item:last-child { border-bottom: none; padding-bottom: 0; }
+        .trend-title {
+            font-size: 14px;
+            color: #374151;
+            margin-bottom: 6px;
+            line-height: 1.4;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .trend-title:hover { color: #0066ff; }
+        .trend-meta { font-size: 12px; color: #9ca3af; }
+        
+        .hot-rank {
+            color: #ef4444;
+            font-weight: bold;
+            font-style: italic;
+            margin-right: 6px;
+        }
+
+    </style>
+</head>
+<body>
+
+    <header class="desktop-header">
+        <div class="header-content">
+            <div class="app-logo">Whisper</div>
+            <div class="search-bar">
+                <input type="text" value="光文社 内部录音" readonly>
+            </div>
+            <div class="user-actions">
+                <span>🔔 消息</span>
+                <span>👤 我的</span>
+                <div class="write-btn">✎ 发布动态</div>
+            </div>
+        </div>
+    </header>
+
+    <div class="layout-container">
+        
+        <aside class="sidebar-left">
+            <div class="nav-menu">
+                <div class="nav-item">🏠 推荐大厅</div>
+                <div class="nav-item">🔥 行业热榜</div>
+                <div class="nav-item active">🏢 光文社专区</div>
+                <div class="nav-item">💼 薪资交流</div>
+                <div class="nav-item">吐槽灌水</div>
+            </div>
+        </aside>
+
+        <main class="main-feed">
+            <div class="post-header">
+                <div class="post-title">突发：黑川龙离世对我们接下来的KPI有何影响？公关部现在焦头烂额了吗？</div>
+                <div class="post-tags">
+                    <span class="active">#光文社内部</span>
+                    <span>#黑川龙案</span>
+                    <span>#出版界地震</span>
+                </div>
+            </div>
+
+            <div class="comments-section">
+                <div class="comment">
+                    <div class="avatar bg-penguin">🐧</div>
+                    <div class="comment-content">
+                        <div class="comment-meta">
+                            <div class="user-info">匿名企鹅 <span class="auth-tag">✓ 员工认证</span></div>
+                            <div class="time-ago">3小时前</div>
+                        </div>
+                        <div class="comment-text">黑川老头子这次死了，光文社的股票得跌停了吧？</div>
+                        <div class="comment-actions">
+                            <div class="action-btn">👍 <span>12</span></div>
+                            <div class="action-btn">💬 <span>回复</span></div>
+                            <div class="action-btn">🔗 <span>分享</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comment">
+                    <div class="avatar bg-shiba">🐕</div>
+                    <div class="comment-content">
+                        <div class="comment-meta">
+                            <div class="user-info">匿名柴犬 <span class="auth-tag">✓ 员工认证</span></div>
+                            <div class="time-ago">2小时前</div>
+                        </div>
+                        <div class="comment-text">跌停？高层估计都在开香槟庆祝他死得是时候。你们真以为他是自杀？</div>
+                        <div class="comment-actions">
+                            <div class="action-btn">👍 <span>45</span></div>
+                            <div class="action-btn">💬 <span>回复</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comment">
+                    <div class="avatar bg-crow">🐦‍⬛</div>
+                    <div class="comment-content">
+                        <div class="comment-meta">
+                            <div class="user-info">匿名乌鸦 <span class="auth-tag">✓ 员工认证</span></div>
+                            <div class="time-ago">1小时前</div>
+                        </div>
+                        <div class="comment-text">楼上的，饭可以乱吃话不能乱讲。小心查你IP，法务部最近正愁没业绩呢。</div>
+                        <div class="comment-actions">
+                            <div class="action-btn">👍 <span>8</span></div>
+                            <div class="action-btn">💬 <span>回复</span></div>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="comment">
+                    <div class="avatar bg-shiba">🐕</div>
+                    <div class="comment-content">
+                        <div class="comment-meta">
+                            <div class="user-info">匿名柴犬 <span class="auth-tag">✓ 员工认证</span></div>
+                            <div class="time-ago">刚刚</div>
+                        </div>
+                        <div class="comment-text">切，我手里有段前两天的录音，你们听听咱们总编是怎么说的吧。</div>
+                        
+                        <div class="attachment-card" onclick="alert('系统提示：正在缓冲音频数据，即将跳转至音频解码器...'); window.location.href='audio_player.html';">
+                            <div class="file-icon">▶</div>
+                            <div class="file-info">
+                                <div class="file-name">Audio_Leak_0412.wav</div>
+                                <div class="file-size">涉密音频 · 1.2 MB</div>
+                            </div>
+                        </div>
+                        
+                        <div class="comment-actions" style="margin-top: 16px;">
+                            <div class="action-btn">👍 <span>128</span></div>
+                            <div class="action-btn">💬 <span>32 回复</span></div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </main>
+
+        <aside class="sidebar-right">
+            <div class="widget-title">📈 公司内部实时热搜</div>
+            <ul class="trend-list">
+                <li class="trend-item">
+                    <div class="trend-title"><span class="hot-rank">1</span>黑川龙追悼会现场，编辑部全员强制出席通知</div>
+                    <div class="trend-meta">热度 89.2w</div>
+                </li>
+                <li class="trend-item">
+                    <div class="trend-title"><span class="hot-rank">2</span>总编室门外爆发激烈争吵，疑似伊藤健司</div>
+                    <div class="trend-meta">热度 65.4w</div>
+                </li>
+                <li class="trend-item">
+                    <div class="trend-title"><span class="hot-rank">3</span>【辟谣】关于黑川作品存在代笔的传闻纯属捏造</div>
+                    <div class="trend-meta">热度 42.1w</div>
+                </li>
+                <li class="trend-item">
+                    <div class="trend-title"><span class="hot-rank">4</span>下半年版税结算及奖金发放延期说明</div>
+                    <div class="trend-meta">热度 28.5w</div>
+                </li>
+            </ul>
+        </aside>
+
+    </div>
+
+</body>
+</html>

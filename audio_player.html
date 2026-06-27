@@ -1,0 +1,394 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>音频解析系统 - Audio_Leak_0412.wav</title>
+    <style>
+        /* ================= 基础重置与暗黑极客风格 ================= */
+        body, html {
+            margin: 0;
+            padding: 0;
+            background-color: #0a0a0a;
+            color: #d1d5db;
+            font-family: "Courier New", Courier, "Noto Serif SC", serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* 严格锁定尺寸为 1000x650，与邮件客户端完全匹配，实现无缝视觉过渡 */
+        .player-container {
+            width: 1000px;
+            height: 650px;
+            background: #111111;
+            border: 1px solid #333;
+            border-radius: 8px;
+            box-shadow: 0 10px 40px rgba(0,0,0,0.8), inset 0 0 15px rgba(255,255,255,0.02);
+            padding: 40px;
+            position: relative;
+            display: flex;
+            flex-direction: column; /* 弹性布局，让翻译框填满剩余高度 */
+        }
+
+        /* 顶部音频信息 */
+        .header {
+            border-bottom: 1px solid #333;
+            padding-bottom: 20px;
+            margin-bottom: 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-end;
+            flex-shrink: 0;
+        }
+        .file-info {
+            display: flex;
+            flex-direction: column;
+            gap: 5px;
+        }
+        .file-name { font-size: 20px; font-weight: bold; color: #fff; letter-spacing: 2px; font-family: monospace;}
+        .file-meta { font-size: 12px; color: #666; font-family: monospace;}
+        .status-badge {
+            background: #4a0000;
+            color: #ff3333;
+            padding: 4px 10px;
+            border-radius: 4px;
+            font-size: 12px;
+            border: 1px solid #800000;
+            animation: blink 2s infinite;
+        }
+        @keyframes blink { 50% { opacity: 0.6; } }
+
+        /* ================= 播放器控制区 ================= */
+        .controls {
+            display: flex;
+            align-items: center;
+            gap: 20px;
+            margin-bottom: 30px;
+            background: #1a1a1a;
+            padding: 15px 20px;
+            border-radius: 8px;
+            border: 1px solid #222;
+            flex-shrink: 0;
+        }
+        
+        .play-btn {
+            width: 50px; height: 50px;
+            background: #fff;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            cursor: pointer;
+            transition: transform 0.2s, background 0.2s;
+            flex-shrink: 0;
+        }
+        .play-btn:hover { transform: scale(1.05); background: #e0e0e0; }
+        .play-icon {
+            width: 0; height: 0;
+            border-top: 10px solid transparent;
+            border-bottom: 10px solid transparent;
+            border-left: 16px solid #000;
+            margin-left: 4px;
+        }
+        .play-btn.playing .play-icon {
+            border: none;
+            width: 14px; height: 16px;
+            background: #000;
+            border-left: 4px solid #000;
+            border-right: 4px solid #000;
+            box-sizing: border-box;
+            background-clip: content-box;
+            padding: 0 2px;
+            margin-left: 0;
+        }
+
+        .progress-container { flex: 1; display: flex; flex-direction: column; gap: 8px; }
+        .time-display { display: flex; justify-content: space-between; font-size: 13px; color: #888; font-family: monospace;}
+        .progress-bar { width: 100%; height: 4px; background: #333; border-radius: 2px; position: relative; overflow: hidden; }
+        .progress-fill { width: 0%; height: 100%; background: #ff3333; position: absolute; top: 0; left: 0; transition: width 0.1s linear; }
+
+        /* 波形动画 */
+        .waveform { display: flex; align-items: center; justify-content: space-between; height: 40px; margin-bottom: 30px; padding: 0 10px; gap: 4px; flex-shrink: 0; }
+        .bar { flex: 1; background: #333; border-radius: 2px; transition: height 0.1s ease; height: 4px; }
+        .waveform.active .bar { background: #ff3333; animation: wave 0.5s infinite alternate ease-in-out; }
+        @keyframes wave { 0% { height: 4px; } 100% { height: 100%; } }
+
+        /* ================= 实时翻译文字区 ================= */
+        .transcript-box {
+            background: #050505;
+            border: 1px solid #222;
+            border-radius: 8px;
+            padding: 30px;
+            flex: 1; /* 自动填满 650px 剩下的高度 */
+            overflow-y: auto;
+            position: relative;
+            scrollbar-width: thin;
+            scrollbar-color: #333 #050505;
+        }
+
+        .line-wrapper {
+            margin-bottom: 30px;
+            opacity: 0;
+            transform: translateY(10px);
+            transition: opacity 0.6s ease, transform 0.6s ease;
+            display: none; /* 初始隐藏 */
+        }
+        .line-wrapper.visible {
+            opacity: 1;
+            transform: translateY(0);
+            display: block;
+        }
+        .line-wrapper:last-child { margin-bottom: 0; }
+
+        .timestamp {
+            font-size: 12px;
+            color: #666;
+            margin-bottom: 5px;
+            font-family: monospace;
+        }
+        
+        .speaker { font-weight: bold; font-size: 14px; margin-bottom: 10px; display: inline-block; padding: 3px 8px; border-radius: 4px; }
+        .speaker-man { color: #60a5fa; background: rgba(96, 165, 250, 0.1); border: 1px solid rgba(96, 165, 250, 0.3); }
+        .speaker-woman { color: #f43f5e; background: rgba(244, 63, 94, 0.1); border: 1px solid rgba(244, 63, 94, 0.3); }
+        .speaker-sys { color: #eab308; }
+
+        .dialogue {
+            font-size: 16px;
+            line-height: 1.8;
+            color: #e5e7eb;
+            text-align: justify;
+        }
+
+        .action-text { color: #888; font-style: italic; font-size: 14px; }
+        
+        /* 核心线索高亮 */
+        .clue-highlight {
+            color: #ff0000;
+            font-weight: bold;
+            font-size: 18px;
+            text-shadow: 0 0 10px rgba(255, 0, 0, 0.6);
+            background: rgba(255, 0, 0, 0.1);
+            padding: 0 4px;
+            border-bottom: 1px dashed #ff0000;
+        }
+
+        /* 录音中断特效 */
+        .glitch-crash {
+            animation: crash-shake 0.3s infinite;
+            filter: contrast(200%);
+            color: #ff0000;
+        }
+        @keyframes crash-shake {
+            0% { transform: translate(2px, 1px) skewX(0deg); }
+            50% { transform: translate(-2px, 2px) skewX(-10deg); text-shadow: 2px 0 blue, -2px 0 red; }
+            100% { transform: translate(1px, -2px) skewX(10deg); }
+        }
+
+        /* ================= 遮罩层 (点击播放前) ================= */
+        .overlay {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0,0,0,0.85);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 100;
+            backdrop-filter: blur(2px);
+            transition: opacity 0.5s;
+        }
+        .start-btn {
+            background: #ff3333;
+            color: white;
+            border: none;
+            padding: 12px 30px;
+            font-size: 16px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            border-radius: 4px;
+            cursor: pointer;
+            box-shadow: 0 0 20px rgba(255, 51, 51, 0.4);
+            transition: all 0.2s;
+        }
+        .start-btn:hover { background: #cc0000; box-shadow: 0 0 30px rgba(255, 51, 51, 0.6); transform: scale(1.05); }
+
+    </style>
+</head>
+<body>
+
+    <div class="player-container" id="container">
+        
+        <div class="overlay" id="overlay">
+            <button class="start-btn" onclick="startPlayback()">▶ 解析并播放原声</button>
+        </div>
+
+        <div class="header">
+            <div class="file-info">
+                <div class="file-name">Audio_Leak_0412.wav</div>
+                <div class="file-meta">MD5: e9f8a3c... | 时长: 00:54 | 状态: 绝密拦截</div>
+            </div>
+            <div class="status-badge">声纹对比匹配完成</div>
+        </div>
+
+        <div class="controls">
+            <div class="play-btn playing" id="playBtn">
+                <div class="play-icon"></div>
+            </div>
+            <div class="progress-container">
+                <div class="time-display">
+                    <span id="currentTime">00:00</span>
+                    <span>00:54</span>
+                </div>
+                <div class="progress-bar">
+                    <div class="progress-fill" id="progressFill"></div>
+                </div>
+            </div>
+        </div>
+
+        <div class="waveform" id="waveform">
+            </div>
+
+        <div class="transcript-box" id="transcriptBox">
+            
+            <div class="line-wrapper" id="line1">
+                <div class="timestamp">[00:03]</div>
+                <div class="speaker speaker-man">中年男声 / 光文社总编</div>
+                <div class="dialogue">
+                    <span class="action-text">（语气烦躁、阴沉，伴随着敲击桌面的声音）</span><br>
+                    “伊藤那个废物最近越来越不受控了。竟然敢拿‘罢笔’来威胁黑川？他当了十几年的影子，真以为自己能见光了？”
+                </div>
+            </div>
+
+            <div class="line-wrapper" id="line2">
+                <div class="timestamp">[00:15]</div>
+                <div class="speaker speaker-woman">未知女声</div>
+                <div class="dialogue">
+                    <span class="action-text">（打火机点烟的声音，伴随着轻蔑的冷笑）</span><br>
+                    “总编，您最好认清现实。现在那条影子，才是我们真正的摇钱树。黑川龙那老东西连握笔的力气都没了，十几年了，他写过一个字吗？如果伊藤真的在下个月的新书发布会上把‘幽灵代笔’的丑闻捅给媒体……黑川名誉扫地是小事，光文社的股价会跌成什么样？我们要赔多少天价违约金？”
+                </div>
+            </div>
+
+            <div class="line-wrapper" id="line3">
+                <div class="timestamp">[00:32]</div>
+                <div class="speaker speaker-man">中年男声 / 光文社总编</div>
+                <div class="dialogue">
+                    <span class="action-text">（压低声音，透出杀气）</span><br>
+                    “所以……绝不能让发布会出乱子。得想个法子，在发布会之前让黑川‘体面’地闭嘴。一个江郎才尽、病入膏肓的文豪，因为重度抑郁而自寻短见……这剧本不是很完美吗？”
+                </div>
+            </div>
+
+            <div class="line-wrapper" id="line4">
+                <div class="timestamp">[00:41]</div>
+                <div class="speaker speaker-man">中年男声 / 光文社总编</div>
+                <div class="dialogue">
+                    <span class="action-text">（焦躁地走动）</span><br>
+                    “我就是想不通！伊藤那条狗当了十几年哑巴，到底受了什么刺激，非要闹个鱼死网破？就凭他那点胆量，也敢一个人掀翻整座董事会？”
+                </div>
+            </div>
+
+            <div class="line-wrapper" id="line5">
+                <div class="timestamp">[00:48]</div>
+                <div class="speaker speaker-woman">未知女声</div>
+                <div class="dialogue">
+                    <span class="action-text">（嗤笑出声）</span><br>
+                    “呵，他当然没那个胆子。但我昨天让人黑了他的私人邮箱。他哪是为了自己，分明是为那个女人铺路呢。连下个月远走高飞的机票都订好了，紧急联系人填的可是——<br>
+                    <span class="clue-highlight">‘黑百合花艺’</span> 的老板娘。”
+                </div>
+            </div>
+
+            <div class="line-wrapper" id="line6">
+                <div class="timestamp">[00:54]</div>
+                <div class="speaker speaker-sys">SYSTEM WARNING</div>
+                <div class="dialogue" id="crashText">
+                    【刺耳的电流麦噪响，音频文件在此处物理损坏，录音戛然而止……】
+                </div>
+            </div>
+
+        </div>
+    </div>
+
+    <script>
+        // 生成波形条
+        const waveform = document.getElementById('waveform');
+        // 适当增加波形条数量以适应 1000px 宽度
+        for (let i = 0; i < 90; i++) {
+            const bar = document.createElement('div');
+            bar.className = 'bar';
+            bar.style.animationDelay = `${Math.random() * 0.5}s`;
+            bar.style.height = `${Math.random() * 100}%`;
+            waveform.appendChild(bar);
+        }
+
+        // 核心时间轴逻辑
+        const totalDuration = 54; 
+        let isPlaying = false;
+        
+        const timeline = [
+            { time: 1, id: 'line1' },
+            { time: 7, id: 'line2' },
+            { time: 20, id: 'line3' },
+            { time: 30, id: 'line4' },
+            { time: 38, id: 'line5' },
+            { time: 51, id: 'line6', isCrash: true }
+        ];
+
+        function startPlayback() {
+            document.getElementById('overlay').style.opacity = '0';
+            setTimeout(() => {
+                document.getElementById('overlay').style.display = 'none';
+                playAudioSim();
+            }, 500);
+        }
+
+        function playAudioSim() {
+            if (isPlaying) return;
+            isPlaying = true;
+            waveform.classList.add('active');
+            
+            let currentTime = 0;
+            const timeDisplay = document.getElementById('currentTime');
+            const progressFill = document.getElementById('progressFill');
+            const transcriptBox = document.getElementById('transcriptBox');
+
+            const timer = setInterval(() => {
+                currentTime += 0.1;
+                progressFill.style.width = `${(currentTime / totalDuration) * 100}%`;
+                
+                const secs = Math.floor(currentTime);
+                timeDisplay.textContent = `00:${secs < 10 ? '0'+secs : secs}`;
+
+                timeline.forEach(event => {
+                    if (Math.abs(currentTime - event.time) < 0.1) {
+                        const line = document.getElementById(event.id);
+                        if (line && !line.classList.contains('visible')) {
+                            line.classList.add('visible');
+                            transcriptBox.scrollTo({
+                                top: transcriptBox.scrollHeight,
+                                behavior: 'smooth'
+                            });
+
+                            if (event.isCrash) triggerCrash();
+                        }
+                    }
+                });
+
+                if (currentTime >= totalDuration) {
+                    clearInterval(timer);
+                    waveform.classList.remove('active');
+                    document.getElementById('playBtn').classList.remove('playing');
+                    isPlaying = false;
+                }
+            }, 100);
+        }
+
+        function triggerCrash() {
+            waveform.classList.remove('active');
+            document.getElementById('container').classList.add('glitch-crash');
+            setTimeout(() => { document.body.style.backgroundColor = "#2a0000"; }, 200);
+        }
+    </script>
+</body>
+</html>

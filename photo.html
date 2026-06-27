@@ -1,0 +1,125 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>魇</title>
+    <style>
+        /* 页面基础暗黑氛围 */
+        body {
+            background-color: #030303;
+            color: #555;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            min-height: 100vh;
+            margin: 0;
+            font-family: "Noto Serif SC", serif;
+            overflow: hidden;
+        }
+
+        /* 盛放照片的容器 */
+        .photo-container {
+            position: relative;
+            width: 90vw;
+            max-width: 900px; /* 控制照片最大宽度 */
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.9);
+            /* 增加一点拍立得的底片白边效果增强现实感 */
+            padding: 10px;
+            background: #1a1a1a;
+            border-radius: 4px;
+        }
+
+        /* 基础底层照片（清晰原图） */
+        .base-image {
+            width: 100%;
+            display: block;
+            pointer-events: none; /* 防止图片自带的拖拽干扰 */
+        }
+
+        /* ========================================================= */
+        /* 关键交互区：伊藤健司的悬停热区 (Hotspot)                    */
+        /* 位于照片最右侧。你可以通过修改 top/right/width/height 调整精度 */
+        /* ========================================================= */
+        .kenji-hotspot {
+            position: absolute;
+            top: 15%;       /* 脸部大概在这个高度 */
+            right: 4%;      /* 靠最右侧 */
+            width: 20%;     /* 覆盖区域宽度 */
+            height: 35%;    /* 覆盖区域高度 */
+            border-radius: 50%;
+            z-index: 20;
+            cursor: crosshair; /* 鼠标变成十字准星，增加调查感 */
+            
+            /* 【调试小技巧】如果你想看清热区的具体位置，可以取消下面这行的注释： */
+            /* border: 1px solid rgba(255,0,0,0.5); background: rgba(255,0,0,0.2); */
+        }
+
+        /* 扭曲图层（盖在原图上方，平时是透明的） */
+        .distorted-layer {
+            position: absolute;
+            top: 10px;      /* 抵消外层 padding */
+            left: 10px;     
+            width: calc(100% - 20px);
+            height: calc(100% - 20px);
+            /* 调用同名图片作为背景 */
+            background-image: url('15f6a5f0-6650-4b9c-8d06-e9072c8badcc.png');
+            background-size: 100% 100%; 
+            /* 绑定我们在 HTML 底部写的 SVG 水波纹滤镜 */
+            filter: url(#water-ripple);
+            opacity: 0;
+            /* 显影时间短(0.4s)代表瞬间的心悸，消退时间长(1.2s)代表余悸未消 */
+            transition: opacity 0.4s ease-in, opacity 1.2s ease-out; 
+            pointer-events: none; /* 让鼠标穿透，不阻挡热区 */
+            z-index: 10;
+        }
+
+        /* 核心触发逻辑：当鼠标悬停在热区时，扭曲层显现 */
+        .kenji-hotspot:hover ~ .distorted-layer {
+            opacity: 1;
+            transition: opacity 0.3s ease-out; /* 触发时迅速扭曲 */
+        }
+
+        .sub-text {
+            margin-top: 30px;
+            font-size: 13px;
+            letter-spacing: 4px;
+            opacity: 0.6;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 
+      隐藏的 SVG 滤镜库 
+      利用 feTurbulence 制造噪波，再用 feDisplacementMap 将噪波转化为画面的扭曲位移。
+    -->
+    <svg style="width: 0; height: 0; position: absolute;">
+        <defs>
+            <filter id="water-ripple">
+                <!-- 生成水波纹理，并通过 animate 让它动起来 (baseFrequency 的改变) -->
+                <feTurbulence type="fractalNoise" baseFrequency="0.01 0.02" numOctaves="3" result="noise">
+                    <animate attributeName="baseFrequency" values="0.01 0.02; 0.02 0.04; 0.01 0.02" dur="4s" repeatCount="indefinite" />
+                </feTurbulence>
+                <!-- 将波纹映射到图像上，scale 控制扭曲的剧烈程度 (30代表中度扭曲) -->
+                <feDisplacementMap in="SourceGraphic" in2="noise" scale="30" xChannelSelector="R" yChannelSelector="G" />
+            </filter>
+        </defs>
+    </svg>
+
+    <div class="photo-container">
+        <!-- 悬停热区 (DOM顺序必须在 distorted-layer 的前面) -->
+        <div class="kenji-hotspot" title="伊藤健司"></div>
+        
+        <!-- 动态扭曲层 (一旦上方 hotspot 被 Hover，这一层就会显现) -->
+        <div class="distorted-layer"></div>
+        
+        <!-- 底层的基础原图 -->
+        <img src="15f6a5f0-6650-4b9c-8d06-e9072c8badcc.png" alt="黑川家族合照" class="base-image">
+    </div>
+
+    <div class="sub-text">你曾经最想撕毁的名字...</div>
+
+</body>
+</html>
