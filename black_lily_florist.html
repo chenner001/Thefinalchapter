@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黒百合花藝 | Black Lily Floral Art</title>
+    <style>
+        /* ================= 基础重置与暗黑极简美学 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #050505; 
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="180" height="180" viewBox="0 0 200 200"><g fill="none" stroke="rgba(255,255,255,0.03)" stroke-width="2"><path d="M100 20 C130 70 120 120 100 150 C80 120 70 70 100 20 Z"/><path d="M100 90 C150 70 180 90 170 130 C140 120 110 110 100 150 Z"/><path d="M100 90 C50 70 20 90 30 130 C60 120 90 110 100 150 Z"/><circle cx="100" cy="90" r="4" fill="rgba(255,255,255,0.03)"/><path d="M100 90 Q110 60 125 55 M100 90 Q90 60 75 55" stroke-width="1"/></g></svg>');
+            background-size: 200px 200px;
+            background-attachment: fixed;
+            color: #dcdcdc;
+            font-family: "Noto Serif SC", "SimSun", "Times New Roman", serif;
+            line-height: 1.8;
+            overflow-x: hidden;
+            user-select: none;
+        }
+
+        /* ================= 顶部导航 ================= */
+        header {
+            width: 100%;
+            padding: 40px 10%;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: absolute;
+            top: 0;
+            z-index: 10;
+        }
+        .logo {
+            font-size: 24px;
+            font-weight: 300;
+            letter-spacing: 10px;
+            color: #ffffff;
+            text-transform: uppercase;
+        }
+        .logo span {
+            display: block;
+            font-size: 10px;
+            letter-spacing: 4px;
+            color: #888;
+            margin-top: 5px;
+            font-family: sans-serif;
+        }
+        .nav-menu {
+            display: flex;
+            gap: 40px;
+            font-size: 13px;
+            letter-spacing: 3px;
+            color: #999;
+        }
+        .nav-menu a {
+            text-decoration: none;
+            color: inherit;
+            transition: color 0.3s;
+        }
+        .nav-menu a:hover { color: #d4af37; }
+
+        /* ================= 首屏视觉 ================= */
+        .hero-section {
+            height: 80vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            background: radial-gradient(circle at center, rgba(26,21,21,0.8) 0%, rgba(5,5,5,0.9) 70%);
+            border-bottom: 1px solid #1a1a1a;
+            overflow: hidden;
+        }
+        
+        .giant-lily-bg {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 800px;
+            height: 800px;
+            opacity: 0.02;
+            pointer-events: none;
+        }
+
+        .hero-title {
+            text-align: center;
+            font-size: 36px;
+            font-weight: 300;
+            letter-spacing: 15px;
+            color: #fff;
+            text-shadow: 0 0 20px rgba(255,255,255,0.05);
+            margin-left: 15px; 
+            z-index: 2;
+        }
+
+        /* ================= 品牌故事 ================= */
+        .story-section {
+            padding: 120px 20%;
+            text-align: center;
+            position: relative;
+            background: rgba(5, 5, 5, 0.6);
+            backdrop-filter: blur(5px);
+        }
+        .section-title {
+            font-size: 14px;
+            letter-spacing: 8px;
+            color: #d4af37;
+            margin-bottom: 40px;
+            text-transform: uppercase;
+        }
+        .story-text {
+            font-size: 16px;
+            color: #aaa;
+            line-height: 2.4;
+            letter-spacing: 2px;
+            max-width: 600px;
+            margin: 0 auto;
+            text-align: justify;
+        }
+        .highlight {
+            color: #fff;
+            font-weight: normal;
+        }
+        
+        /* 创始人签名 */
+        .founder-sign {
+            margin-top: 40px;
+            font-family: "Brush Script MT", "Snell Roundhand", cursive;
+            font-size: 32px;
+            color: #d4af37;
+            text-align: right;
+            padding-right: 20px;
+            opacity: 0.8;
+            letter-spacing: 2px;
+        }
+        .founder-title {
+            display: block;
+            font-family: sans-serif;
+            font-size: 10px;
+            letter-spacing: 3px;
+            color: #666;
+            margin-top: 5px;
+            text-transform: uppercase;
+        }
+
+        /* ================= 动态展示区 ================= */
+        .news-section {
+            padding: 80px 20% 120px;
+            border-top: 1px solid #111;
+            background: rgba(5, 5, 5, 0.8);
+        }
+        .news-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: baseline;
+            padding: 30px 0;
+            border-bottom: 1px solid #1a1a1a;
+            transition: all 0.3s;
+        }
+        .news-item:hover {
+            border-bottom-color: #d4af37;
+        }
+        .news-date {
+            font-size: 12px;
+            letter-spacing: 3px;
+            color: #666;
+            font-family: monospace;
+            width: 150px;
+        }
+        .news-content {
+            flex: 1;
+            font-size: 15px;
+            letter-spacing: 2px;
+            color: #ccc;
+        }
+
+        /* ================= 底部与隐藏入口 ================= */
+        footer {
+            text-align: center;
+            padding: 40px 20px;
+            font-size: 11px;
+            letter-spacing: 4px;
+            color: #333;
+            background-color: #020202;
+            position: relative;
+            border-top: 1px solid #111;
+        }
+
+        .hidden-login-trigger {
+            position: absolute;
+            bottom: 40px;
+            right: 40px;
+            color: #1a1a1a; 
+            text-decoration: none;
+            cursor: pointer;
+            transition: color 0.5s;
+            font-weight: bold;
+        }
+        .hidden-login-trigger:hover {
+            color: #666; 
+        }
+
+        /* ================= 登录弹窗 (员工登入) ================= */
+        .login-overlay {
+            position: fixed;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: rgba(0, 0, 0, 0.95);
+            backdrop-filter: blur(10px);
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.5s;
+        }
+        .login-overlay.active {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        
+        .login-box {
+            background: #0a0a0a;
+            border: 1px solid #222;
+            padding: 50px;
+            width: 400px;
+            text-align: center;
+            box-shadow: 0 20px 50px rgba(0,0,0,1);
+            position: relative;
+        }
+        
+        .close-btn {
+            position: absolute;
+            top: 15px; right: 20px;
+            color: #555;
+            font-size: 20px;
+            cursor: pointer;
+            transition: color 0.2s;
+        }
+        .close-btn:hover { color: #fff; }
+
+        .login-title {
+            font-size: 14px;
+            letter-spacing: 6px;
+            color: #888;
+            margin-bottom: 40px;
+        }
+        
+        .password-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #444;
+            color: #fff;
+            font-size: 24px;
+            text-align: center;
+            letter-spacing: 15px;
+            padding: 10px;
+            outline: none;
+            font-family: monospace;
+            transition: border-color 0.3s;
+        }
+        .password-input:focus { border-bottom-color: #d4af37; }
+        
+        .login-hint {
+            margin-top: 30px;
+            font-size: 12px;
+            color: #444;
+            letter-spacing: 2px;
+        }
+
+        .error-msg {
+            color: #8b0000;
+            font-size: 12px;
+            letter-spacing: 2px;
+            margin-top: 15px;
+            opacity: 0;
+            transition: opacity 0.3s;
+        }
+        .error-msg.show { opacity: 1; }
+
+        .glitch-transition {
+            animation: glitch 0.2s infinite;
+        }
+        @keyframes glitch {
+            0% { filter: invert(0); transform: translate(0); }
+            50% { filter: invert(1); transform: translate(-2px, 2px); }
+            100% { filter: invert(0); transform: translate(2px, -2px); }
+        }
+
+    </style>
+</head>
+<body>
+
+    <!-- 顶部导航 -->
+    <header>
+        <div class="logo">
+            黒百合
+            <span>Black Lily Florist</span>
+        </div>
+        <nav class="nav-menu">
+            <a href="#">关于品牌</a>
+            <a href="#">私密定制</a>
+            <a href="#">花艺鉴赏</a>
+            <a href="#">联系我们</a>
+        </nav>
+    </header>
+
+    <!-- 首屏 -->
+    <section class="hero-section">
+        <!-- 巨型暗色百合花背景 -->
+        <svg class="giant-lily-bg" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+            <g fill="none" stroke="#ffffff" stroke-width="2">
+                <path d="M100 20 C130 70 120 120 100 150 C80 120 70 70 100 20 Z"/>
+                <path d="M100 90 C150 70 180 90 170 130 C140 120 110 110 100 150 Z"/>
+                <path d="M100 90 C50 70 20 90 30 130 C60 120 90 110 100 150 Z"/>
+                <circle cx="100" cy="90" r="4" fill="#ffffff"/>
+                <path d="M100 90 Q110 60 125 55 M100 90 Q90 60 75 55" stroke-width="1"/>
+            </g>
+        </svg>
+        <h1 class="hero-title">深 渊 中 的 绽 放</h1>
+    </section>
+
+    <!-- 品牌故事 -->
+    <section class="story-section">
+        <div class="section-title">Brand Story</div>
+        <div class="story-text">
+            <span class="highlight">黑百合花艺</span>。<br>
+            由首席花艺师 <span class="highlight">黑川百合 (Yuri Kurokawa)</span> 倾心打造。<br><br>
+            黑百合的花语是：“诅咒”与“孤傲的爱”。<br>
+            我们致力于为少数尊贵客户提供最具私密性的高级花艺定制。<br>
+            无论是见证誓言的盛大婚庆，还是庄严静谧的追悼仪式，<br>
+            每一朵花，都承载着不可言说的秘密。
+            
+            <div class="founder-sign">
+                Yuri Kurokawa
+                <span class="founder-title">Founder & Chief Florist</span>
+            </div>
+        </div>
+    </section>
+
+    <!-- 动态 / 案例展示 -->
+    <section class="news-section">
+        <div class="section-title" style="text-align: center;">Recent Works</div>
+        
+        <div class="news-item">
+            <div class="news-date">2026.06.23</div>
+            <div class="news-content">
+                承办日本文学泰斗 <span class="highlight">黑川龙先生追悼会</span> 全场白菊布景及献花仪式。
+            </div>
+        </div>
+        
+        <div class="news-item">
+            <div class="news-date">2026.05.12</div>
+            <div class="news-content">
+                为驻日使馆春季私人晚宴提供“深红夜曲”主题桌面花艺。
+            </div>
+        </div>
+        
+        <div class="news-item">
+            <div class="news-date">2026.02.14</div>
+            <div class="news-content">
+                推出情人节限量黑百合永生花礼盒：【至死不渝的罪】。
+            </div>
+        </div>
+    </section>
+
+    <!-- 底部版权与隐藏入口 -->
+    <footer>
+        &copy; 2026 BLACK LILY FLORAL ART. ALL RIGHTS RESERVED.<br>
+        TOKYO, JAPAN
+        
+        <!-- 隐秘的员工登入链接 -->
+        <a class="hidden-login-trigger" id="openLoginBtn">[ 员工登入 ]</a>
+    </footer>
+
+    <!-- 登录弹窗 (隐藏后台入口) -->
+    <div class="login-overlay" id="loginOverlay">
+        <div class="login-box">
+            <div class="close-btn" id="closeLoginBtn">&times;</div>
+            <div class="login-title">SYSTEM GATEWAY</div>
+            
+            <input type="password" class="password-input" id="pwdInput" maxlength="4" autocomplete="off">
+            
+            <div class="login-hint">
+                [ 提示：这家店，与罪恶的种子同年诞生。(YYYY) ]
+            </div>
+            <div class="error-msg" id="errorMsg">ACCESS DENIED</div>
+        </div>
+    </div>
+
+    <script>
+        const openBtn = document.getElementById('openLoginBtn');
+        const closeBtn = document.getElementById('closeLoginBtn');
+        const overlay = document.getElementById('loginOverlay');
+        const pwdInput = document.getElementById('pwdInput');
+        const errorMsg = document.getElementById('errorMsg');
+
+        openBtn.addEventListener('click', () => {
+            overlay.classList.add('active');
+            setTimeout(() => pwdInput.focus(), 100); 
+        });
+
+        closeBtn.addEventListener('click', () => {
+            overlay.classList.remove('active');
+            pwdInput.value = '';
+            errorMsg.classList.remove('show');
+        });
+
+        pwdInput.addEventListener('input', function() {
+            this.value = this.value.replace(/[^0-9]/g, '');
+            errorMsg.classList.remove('show');
+
+            if (this.value.length === 4) {
+                if (this.value === '2007') {
+                    pwdInput.disabled = true;
+                    document.body.classList.add('glitch-transition');
+                    
+                    setTimeout(() => {
+                        window.location.href = 'hidden_backend.html';
+                    }, 1500);
+                } else {
+                    errorMsg.classList.add('show');
+                    setTimeout(() => {
+                        this.value = '';
+                        this.focus();
+                    }, 800);
+                }
+            }
+        });
+    </script>
+
+</body>
+</html>

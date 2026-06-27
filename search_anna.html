@@ -1,0 +1,308 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>宫崎安奈 - Search Engine</title>
+    <style>
+        /* ================= 基础重置与桌面背景 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* ================= macOS 浏览器视窗 ================= */
+        .mac-window {
+            width: 85%;
+            max-width: 1100px;
+            height: 80vh;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: windowPopUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes windowPopUp {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* 顶部控制栏 (Title Bar) */
+        .title-bar {
+            height: 52px;
+            background-color: #f5f5f7;
+            border-bottom: 1px solid #d1d1d6;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* 红黄绿红绿灯按钮 */
+        .traffic-lights {
+            display: flex;
+            gap: 8px;
+            width: 60px;
+        }
+        .traffic-lights span {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .close { background-color: #ff5f56; border: 1px solid #e0443e; }
+        .minimize { background-color: #ffbd2e; border: 1px solid #dea123; }
+        .maximize { background-color: #27c93f; border: 1px solid #1aab29; }
+
+        /* 浏览器地址栏 */
+        .url-bar {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            left: 0; right: 0;
+            pointer-events: none;
+        }
+        .url-input {
+            width: 40%;
+            min-width: 300px;
+            height: 28px;
+            background-color: #e3e3e5;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1d1d1f;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        .url-input span { opacity: 0.5; margin-right: 5px; }
+
+        /* ================= 搜索结果页面布局 ================= */
+        .browser-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            overflow-y: auto; /* 允许内部滚动 */
+        }
+
+        /* 搜索顶部：Logo与搜索框 */
+        .search-header {
+            display: flex;
+            align-items: center;
+            padding: 25px 30px 15px 30px;
+            border-bottom: 1px solid #ebebeb;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+
+        .mini-logo {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-right: 30px;
+            user-select: none;
+        }
+        .mini-logo span:nth-child(1) { color: #4285F4; }
+        .mini-logo span:nth-child(2) { color: #EA4335; }
+        .mini-logo span:nth-child(3) { color: #FBBC05; }
+        .mini-logo span:nth-child(4) { color: #4285F4; }
+        .mini-logo span:nth-child(5) { color: #34A853; }
+        .mini-logo span:nth-child(6) { color: #EA4335; }
+
+        .mini-search-box {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 650px;
+            height: 44px;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            padding: 0 20px;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .mini-search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #202124;
+            padding-left: 10px;
+        }
+        .clear-icon { color: #70757a; font-size: 18px; cursor: pointer; padding-right: 15px; border-right: 1px solid #dfe1e5;}
+        .search-icon { color: #4285F4; font-size: 18px; cursor: pointer; padding-left: 15px; font-weight: bold;}
+
+        /* 搜索类型 Tab */
+        .search-tabs {
+            display: flex;
+            padding: 0 160px;
+            border-bottom: 1px solid #ebebeb;
+            color: #5f6368;
+            font-size: 14px;
+        }
+        .search-tabs div {
+            padding: 12px 16px;
+            cursor: pointer;
+        }
+        .search-tabs .active {
+            color: #1a73e8;
+            border-bottom: 3px solid #1a73e8;
+        }
+
+        /* 搜索结果列表 */
+        .results-container {
+            padding: 30px 160px;
+            max-width: 900px;
+        }
+
+        .result-info {
+            color: #70757a;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .result-item {
+            margin-bottom: 35px;
+            line-height: 1.5;
+        }
+
+        .result-url {
+            font-size: 14px;
+            color: #202124;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .result-url span { color: #4d5156; margin: 0 5px; font-size: 12px; }
+
+        .result-title {
+            font-size: 20px;
+            color: #1a0dab;
+            text-decoration: none;
+            font-weight: 400;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+        .result-title:hover {
+            text-decoration: underline;
+        }
+
+        .result-desc {
+            font-size: 14px;
+            color: #4d5156;
+            max-width: 650px;
+            word-wrap: break-word;
+        }
+        .result-desc strong {
+            color: #202124;
+        }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bdc1c6; }
+    </style>
+</head>
+<body>
+
+    <div class="mac-window">
+        <!-- Safari 风格顶部栏 -->
+        <div class="title-bar">
+            <div class="traffic-lights">
+                <span class="close"></span>
+                <span class="minimize"></span>
+                <span class="maximize"></span>
+            </div>
+            <div class="url-bar">
+                <div class="url-input">
+                    <span>🔒</span> www.search-engine.com/search?q=宫崎安奈
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索引擎主体 -->
+        <div class="browser-content">
+            
+            <!-- 搜索头 -->
+            <div class="search-header">
+                <div class="mini-logo">
+                    <span>S</span><span>e</span><span>a</span><span>r</span><span>c</span><span>h</span>
+                </div>
+                <div class="mini-search-box">
+                    <input type="text" value="宫崎安奈">
+                    <div class="clear-icon">×</div>
+                    <div class="search-icon">🔍</div>
+                </div>
+            </div>
+
+            <!-- 搜索分类 -->
+            <div class="search-tabs">
+                <div class="active">全部</div>
+                <div>资讯</div>
+                <div>图片</div>
+                <div>博客</div>
+            </div>
+
+            <!-- 搜索结果列表 -->
+            <div class="results-container">
+                <div class="result-info">找到约 7,400 条结果 （用时 0.22 秒）</div>
+
+                <!-- 您要求保留的三条核心搜索结果 -->
+
+                <!-- 1. 光文社百科 (官方履历) -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://wiki.kobunsha-internal.jp <span>></span> people <span>></span> anna-miyazaki
+                    </div>
+                    <!-- 跳转到 wiki_anna.html，新标签页打开 -->
+                    <a href="wiki_anna.html" target="_blank" class="result-title">宫崎安奈 - 光文社 历任人物百科词条</a>
+                    <div class="result-desc">
+                        <strong>宫崎安奈</strong>，前光文社资深版权经纪人。在其任职期间，深得黑川龙老师的信任，2007年突然辞职。
+                    </div>
+                </div>
+
+                <!-- 2. 论坛争议 (点明情妇绯闻与夺权内幕) -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://bbs.2ch-archives.jp <span>></span> publishing <span>></span> gossip
+                    </div>
+                    <!-- 跳转到 2ch_gossip.html，新标签页打开 -->
+                    <a href="2ch_gossip.html" target="_blank" class="result-title">【匿名八卦】当年光文社的宫崎安奈，现在到底在干嘛？</a>
+                    <div class="result-desc">
+                        名無しさん＠腹打てば響く 2021/04/12(月) 14:22:05.12 ID: 8vNxq1A0
+突然想起来这个人。当年发掘了某位国民级悬疑小说家的王牌编辑，2007年突然消失了。有人知道她去哪了吗？
+                    </div>
+                </div>
+
+                <!-- 3. 个人博客 (隐藏的复仇宣言) -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://anna-literary-notes.jp <span>></span> blog
+                    </div>
+                    <!-- 跳转到 blog_index.html，新标签页打开 -->
+                    <a href="blog_index.html" target="_blank" class="result-title">宫崎安奈的个人手记 | Anna's Notes</a>
+                    <div class="result-desc">
+                        曾经记录黑川老师签售会与出版日常的博客，如今已清空了大部分内容。【置顶日志】：篇章的终结，与长夜的开始。
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

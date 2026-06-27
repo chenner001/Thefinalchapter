@@ -1,0 +1,343 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>黑百合花艺 - Search Engine</title>
+    <style>
+        /* ================= 基础重置与桌面背景 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            background: linear-gradient(135deg, #a8edea 0%, #fed6e3 100%);
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+        }
+
+        /* ================= macOS 浏览器视窗 ================= */
+        .mac-window {
+            width: 85%;
+            max-width: 1100px;
+            height: 80vh;
+            background-color: #ffffff;
+            border-radius: 12px;
+            box-shadow: 0 25px 60px rgba(0, 0, 0, 0.25), 0 0 1px rgba(0, 0, 0, 0.3);
+            display: flex;
+            flex-direction: column;
+            overflow: hidden;
+            animation: windowPopUp 0.6s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+        }
+
+        @keyframes windowPopUp {
+            from { opacity: 0; transform: scale(0.95) translateY(10px); }
+            to { opacity: 1; transform: scale(1) translateY(0); }
+        }
+
+        /* 顶部控制栏 (Title Bar) */
+        .title-bar {
+            height: 52px;
+            background-color: #f5f5f7;
+            border-bottom: 1px solid #d1d1d6;
+            display: flex;
+            align-items: center;
+            padding: 0 15px;
+            position: relative;
+            flex-shrink: 0;
+        }
+
+        /* 红黄绿红绿灯按钮 */
+        .traffic-lights {
+            display: flex;
+            gap: 8px;
+            width: 60px;
+        }
+        .traffic-lights span {
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            display: inline-block;
+        }
+        .close { background-color: #ff5f56; border: 1px solid #e0443e; }
+        .minimize { background-color: #ffbd2e; border: 1px solid #dea123; }
+        .maximize { background-color: #27c93f; border: 1px solid #1aab29; }
+
+        /* 浏览器地址栏 */
+        .url-bar {
+            flex: 1;
+            display: flex;
+            justify-content: center;
+            position: absolute;
+            left: 0; right: 0;
+            pointer-events: none;
+        }
+        .url-input {
+            width: 40%;
+            min-width: 300px;
+            height: 28px;
+            background-color: #e3e3e5;
+            border-radius: 6px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #1d1d1f;
+            font-size: 13px;
+            letter-spacing: 0.5px;
+        }
+        .url-input span { opacity: 0.5; margin-right: 5px; }
+
+        /* ================= 搜索结果页面布局 ================= */
+        .browser-content {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            background-color: #ffffff;
+            overflow-y: auto; /* 允许内部滚动 */
+        }
+
+        /* 搜索顶部：Logo与搜索框 */
+        .search-header {
+            display: flex;
+            align-items: center;
+            padding: 25px 30px 15px 30px;
+            border-bottom: 1px solid #ebebeb;
+            position: sticky;
+            top: 0;
+            background: #fff;
+            z-index: 10;
+        }
+
+        .mini-logo {
+            font-size: 26px;
+            font-weight: 700;
+            letter-spacing: -1px;
+            margin-right: 30px;
+            user-select: none;
+        }
+        .mini-logo span:nth-child(1) { color: #4285F4; }
+        .mini-logo span:nth-child(2) { color: #EA4335; }
+        .mini-logo span:nth-child(3) { color: #FBBC05; }
+        .mini-logo span:nth-child(4) { color: #4285F4; }
+        .mini-logo span:nth-child(5) { color: #34A853; }
+        .mini-logo span:nth-child(6) { color: #EA4335; }
+
+        .mini-search-box {
+            display: flex;
+            align-items: center;
+            width: 100%;
+            max-width: 650px;
+            height: 44px;
+            border: 1px solid #dfe1e5;
+            border-radius: 24px;
+            padding: 0 20px;
+            background: #fff;
+            box-shadow: 0 1px 4px rgba(0,0,0,0.08);
+        }
+        .mini-search-box input {
+            flex: 1;
+            border: none;
+            outline: none;
+            font-size: 16px;
+            color: #202124;
+            padding-left: 10px;
+        }
+        .clear-icon { color: #70757a; font-size: 18px; cursor: pointer; padding-right: 15px; border-right: 1px solid #dfe1e5;}
+        .search-icon { color: #4285F4; font-size: 18px; cursor: pointer; padding-left: 15px; font-weight: bold;}
+
+        /* 搜索类型 Tab */
+        .search-tabs {
+            display: flex;
+            padding: 0 160px;
+            border-bottom: 1px solid #ebebeb;
+            color: #5f6368;
+            font-size: 14px;
+        }
+        .search-tabs div {
+            padding: 12px 16px;
+            cursor: pointer;
+        }
+        .search-tabs .active {
+            color: #1a73e8;
+            border-bottom: 3px solid #1a73e8;
+        }
+
+        /* 搜索结果列表 */
+        .results-container {
+            padding: 30px 160px;
+            max-width: 900px;
+        }
+
+        .result-info {
+            color: #70757a;
+            font-size: 14px;
+            margin-bottom: 25px;
+        }
+
+        .result-item {
+            margin-bottom: 35px;
+            line-height: 1.5;
+        }
+
+        .result-url {
+            font-size: 14px;
+            color: #202124;
+            margin-bottom: 5px;
+            display: flex;
+            align-items: center;
+        }
+        .result-url span { color: #4d5156; margin: 0 5px; font-size: 12px; }
+
+        .result-title {
+            font-size: 20px;
+            color: #1a0dab;
+            text-decoration: none;
+            font-weight: 400;
+            display: inline-block;
+            margin-bottom: 4px;
+        }
+        .result-title:hover {
+            text-decoration: underline;
+        }
+
+        .result-desc {
+            font-size: 14px;
+            color: #4d5156;
+            max-width: 650px;
+            word-wrap: break-word;
+        }
+        .result-desc strong {
+            color: #202124;
+        }
+
+        /* 右侧企业卡片 (Knowledge Panel) */
+        .knowledge-panel {
+            float: right;
+            width: 320px;
+            border: 1px solid #dfe1e5;
+            border-radius: 8px;
+            padding: 20px;
+            margin-left: 40px;
+            margin-bottom: 20px;
+            background-color: #fafbfc;
+        }
+        .kp-title { font-size: 22px; color: #202124; margin-bottom: 5px; }
+        .kp-subtitle { font-size: 14px; color: #70757a; margin-bottom: 15px; }
+        .kp-desc { font-size: 14px; color: #4d5156; line-height: 1.6; margin-bottom: 15px; }
+        .kp-row { font-size: 14px; margin-bottom: 8px; }
+        .kp-row span { color: #70757a; font-weight: bold; margin-right: 8px; }
+
+        /* 滚动条美化 */
+        ::-webkit-scrollbar { width: 8px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: #dadce0; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #bdc1c6; }
+    </style>
+</head>
+<body>
+
+    <div class="mac-window">
+        <!-- Safari 风格顶部栏 -->
+        <div class="title-bar">
+            <div class="traffic-lights">
+                <span class="close"></span>
+                <span class="minimize"></span>
+                <span class="maximize"></span>
+            </div>
+            <div class="url-bar">
+                <div class="url-input">
+                    <span>🔒</span> www.search-engine.com/search?q=黑百合花艺
+                </div>
+            </div>
+        </div>
+
+        <!-- 搜索引擎主体 -->
+        <div class="browser-content">
+            
+            <!-- 搜索头 -->
+            <div class="search-header">
+                <div class="mini-logo">
+                    <span>S</span><span>e</span><span>a</span><span>r</span><span>c</span><span>h</span>
+                </div>
+                <div class="mini-search-box">
+                    <input type="text" value="黑百合花艺">
+                    <div class="clear-icon">×</div>
+                    <div class="search-icon">🔍</div>
+                </div>
+            </div>
+
+            <!-- 搜索分类 -->
+            <div class="search-tabs">
+                <div class="active">全部</div>
+                <div>图片</div>
+                <div>地图</div>
+                <div>新闻</div>
+            </div>
+
+            <!-- 搜索结果列表 -->
+            <div class="results-container">
+                <div class="result-info">找到约 342,000 条结果 （用时 0.25 秒）</div>
+
+                <!-- 右侧企业名片 (Knowledge Panel) 增加真实感 -->
+                <div class="knowledge-panel">
+                    <div class="kp-title">黑百合花艺 (Black Lily)</div>
+                    <div class="kp-subtitle">高级定制花艺沙龙</div>
+                    <div class="kp-desc">
+                        由文坛泰斗黑川龙之妻——黑川百合女士创立的顶级花艺沙龙。专为政商名流及高级宴会提供奢侈级花卉定制与空间陈设服务，以“奢华、冷艳与致命的美学”闻名于东京社交圈。
+                    </div>
+                    <div class="kp-row"><span>创始人：</span>黑川百合</div>
+                    <div class="kp-row"><span>总店地址：</span>东京都港区南青山</div>
+                    <div class="kp-row"><span>服务对象：</span>VVIP会员制</div>
+                </div>
+
+                <!-- 核心结果：指向 花艺官网 -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://www.blacklily-florist.jp <span>></span> home
+                    </div>
+                    <!-- 跳转到 black_lily_florist.html，新标签页打开 -->
+                    <a href="black_lily_florist.html" target="_blank" class="result-title">黑百合花艺 Black Lily Florist | 官方网站</a>
+                    <div class="result-desc">
+                        <strong>黑百合花艺</strong>（Black Lily Florist）官方网站。坐落于东京南青山，我们致力于将最高级的自然馈赠转化为永恒的艺术。提供私人宅邸花卉布置、高级晚宴花艺定制、以及会员专属的顶级插花课程...
+                    </div>
+                </div>
+
+                <!-- 虚构干扰项1：时尚杂志专访 -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://vogue-japan.jp <span>></span> society <span>></span> events
+                    </div>
+                    <a href="#" class="result-title">绝美且致命的冷艳美学——专访「黑百合花艺」主理人黑川百合</a>
+                    <div class="result-desc">
+                        在南青山的旗舰店里，我们见到了知名作家黑川龙的夫人、同时也是<strong>黑百合花艺</strong>的主理人黑川百合女士。她优雅地修剪着带有倒刺的黑色玫瑰，向我们讲述了她对“生命与凋零”的独特见解，以及她如何在这个男性主导的世界里建立属于自己的商业版图...
+                    </div>
+                </div>
+
+                <!-- 虚构干扰项2：八卦论坛 (暗示新书发布会) -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://bbs.tokyo-lounge.jp <span>></span> gossip <span>></span> thread
+                    </div>
+                    <a href="#" class="result-title">[闲聊] 黑川老师刚去世，百合夫人的花店马上要接天价大单了？</a>
+                    <div class="result-desc">
+                        听说昨天黑川老师追悼会上的花都是<strong>黑百合花艺</strong>自己包办的。而且最离谱的是，25号伊藤健司那场轰动全网的新书《虚妄之冕》发布会，会场的全景花艺布置也是百合夫人亲自操刀……这未亡人也太有事业心了吧？
+                    </div>
+                </div>
+                
+                <!-- 虚构干扰项3：招聘信息 (暗示店内有秘密) -->
+                <div class="result-item">
+                    <div class="result-url">
+                        https://job.biz-navi.jp <span>></span> retail <span>></span> luxury
+                    </div>
+                    <a href="#" class="result-title">黑百合花艺 - 招聘 高级花艺助理 (需签署保密协议)</a>
+                    <div class="result-desc">
+                        <strong>黑百合花艺</strong>现招聘全职门店助理。要求熟悉高档名贵花卉养护，形象气质佳。本店常年服务于政商界及演艺圈VVIP客户，入职前必须接受严格背景调查，并签署最高级别的商业及隐私保密协议...
+                    </div>
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

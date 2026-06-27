@@ -1,0 +1,326 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>YUKI_TRUST_离岸信托法律终极条款.pdf - SECURE VIEWER</title>
+    <style>
+        /* ================= PDF 阅读器基础 UI ================= */
+        body {
+            margin: 0;
+            padding: 0;
+            background-color: #323639; /* PDF阅读器经典深灰背景 */
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            display: flex;
+            flex-direction: column;
+            height: 100vh;
+        }
+
+        /* 顶部工具栏 */
+        .pdf-toolbar {
+            background-color: #2b2b2b;
+            color: #f1f1f1;
+            padding: 10px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+            font-size: 14px;
+            z-index: 10;
+        }
+        .toolbar-title { font-family: "Courier New", monospace; font-weight: bold; display: flex; align-items: center; }
+        .toolbar-controls span { margin-left: 15px; cursor: pointer; color: #aaa; }
+        .toolbar-controls span:hover { color: #fff; }
+        
+        /* 模拟专线授权IP标签 */
+        .ip-badge {
+            background-color: rgba(46, 160, 67, 0.15);
+            color: #3fb950;
+            border: 1px solid rgba(46, 160, 67, 0.4);
+            padding: 2px 8px;
+            border-radius: 3px;
+            font-size: 11px;
+            margin-left: 15px;
+            font-weight: normal;
+            letter-spacing: 0.5px;
+        }
+
+        /* 文档容器 */
+        .pdf-container {
+            flex: 1;
+            overflow-y: auto;
+            padding: 40px 20px;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+        }
+
+        /* PDF 纸张样式 */
+        .pdf-page {
+            background-color: #ffffff;
+            width: 800px;
+            min-height: 1131px; /* A4 比例 */
+            height: fit-content;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.5);
+            padding: 80px;
+            box-sizing: border-box;
+            position: relative;
+            color: #000;
+            font-family: "Noto Serif CJK SC", "Songti SC", "Times New Roman", serif;
+            line-height: 1.8;
+            overflow: hidden;
+        }
+
+        /* 绝密水印 */
+        .watermark {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%) rotate(-45deg);
+            font-size: 100px;
+            color: rgba(200, 0, 0, 0.04);
+            font-weight: bold;
+            pointer-events: none;
+            white-space: nowrap;
+            z-index: 1;
+        }
+
+        /* 文本排版 */
+        .doc-content { position: relative; z-index: 2; }
+        
+        .doc-header {
+            text-align: center;
+            border-bottom: 2px solid #000;
+            padding-bottom: 20px;
+            margin-bottom: 40px;
+        }
+        .doc-title {
+            font-size: 24px;
+            font-weight: bold;
+            letter-spacing: 2px;
+        }
+        .doc-subtitle {
+            font-size: 14px;
+            color: #555;
+            margin-top: 10px;
+            font-family: "Courier New", monospace;
+        }
+
+        h3 {
+            font-size: 16px;
+            border-left: 4px solid #000;
+            padding-left: 10px;
+            margin-top: 40px;
+            margin-bottom: 15px;
+        }
+
+        .clause {
+            font-size: 14.5px;
+            margin-bottom: 20px;
+            text-align: justify;
+        }
+        .clause-title {
+            font-weight: bold;
+        }
+
+        /* 重点高亮 */
+        .highlight-yellow {
+            background-color: rgba(255, 235, 59, 0.4);
+            padding: 2px 0;
+        }
+        .highlight-red {
+            background-color: rgba(255, 107, 107, 0.2);
+            border-bottom: 2px solid #ff5252;
+            padding: 2px 0;
+        }
+        
+        /* 侧边系统批注框 */
+        .system-note {
+            background-color: #f8f9fa;
+            border: 1px dashed #999;
+            padding: 15px;
+            font-family: "Courier New", monospace;
+            font-size: 12px;
+            color: #333;
+            margin: 20px 0;
+            line-height: 1.6;
+        }
+
+        /* ================= 右下角加密邮件通知样式 ================= */
+        .mail-notification {
+            display: none;
+            position: fixed;
+            bottom: 25px;
+            right: 25px;
+            width: 340px;
+            background-color: #161b22;
+            border: 1px solid #30363d;
+            border-left: 4px solid #2ea043;
+            border-radius: 6px;
+            box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+            padding: 16px;
+            z-index: 1000;
+            cursor: pointer;
+            transition: transform 0.2s ease, border-color 0.2s ease;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
+        }
+
+        .mail-notification:hover {
+            transform: translateY(-2px);
+            border-color: #2ea043;
+            box-shadow: 0 12px 28px rgba(0, 0, 0, 0.8);
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(50px); opacity: 0; }
+            to { transform: translateY(0); opacity: 1; }
+        }
+
+        .noti-header {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            font-family: "Courier New", monospace;
+            font-size: 11px;
+            color: #3fb950;
+            font-weight: bold;
+            margin-bottom: 8px;
+            letter-spacing: 0.5px;
+        }
+
+        .noti-badge {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .noti-dot {
+            width: 6px;
+            height: 6px;
+            background-color: #3fb950;
+            border-radius: 50%;
+            margin-right: 6px;
+            box-shadow: 0 0 6px #3fb950;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.4; }
+            100% { opacity: 1; }
+        }
+
+        .noti-title {
+            color: #f0f6fc;
+            font-size: 13.5px;
+            font-weight: bold;
+            margin-bottom: 4px;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+        .noti-desc {
+            color: #8b949e;
+            font-size: 12px;
+            line-height: 1.4;
+            font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="pdf-toolbar">
+        <div class="toolbar-title">
+            <span>📄 YUKI_TRUST_离岸信托法律终极条款.pdf (页码 4/12)</span>
+            <span class="ip-badge">NETWORK SECURED // AUTHORIZED IP: 210.143.35.72 (黑川雪)</span>
+        </div>
+        <div class="toolbar-controls">
+            <span>[100%]</span>
+            <span>打印禁止</span>
+            <span>下载禁止</span>
+        </div>
+    </div>
+
+    <div class="pdf-container">
+        <div class="pdf-page">
+            <div class="watermark">STRICTLY CONFIDENTIAL</div>
+            
+            <div class="doc-content">
+                <div class="doc-header">
+                    <div class="doc-title">YUKI_TRUST 离岸信托设立契约</div>
+                    <div class="doc-subtitle">附录 A：资产隔离声明与极端风险规避备忘录</div>
+                </div>
+
+                <div class="system-note">
+                    <strong>[安全网络审计提示]：</strong> 经受托方数字防火墙核验，当前网络环境已锁定。本文件包含最高级别法理及财产隐秘，<span style="color: #c93b2b; font-weight: bold;">仅允许受益人专用静态IP网络节点（210.143.35.72 // 黑川雪 独立物理线路）进行远程点对点解密查看</span>。非授权网络截获将自动触发数据底层熔断。<br><br>
+                    <strong>[系统索引提示]：</strong> 本章节为委托人（黑川龙）与受托代理人（宫崎安奈）确立的资金转移底层逻辑。旨在物理与法理层面，彻底切断配偶（黑川百合）及第三方利益集团对本信托内 2,000,000,000 JPY（二十亿日元）资产的干涉权。
+                </div>
+
+                <h3>第三条：法定继承权之规避与资产剥离</h3>
+                <div class="clause">
+                    <span class="clause-title">3.1 规避配偶法定份额及“特留分”：</span>
+                    依据日本现行继承法，若委托人未立遗嘱，配偶将合法剥夺至少 50% 之遗产；若委托人立有全额指定受益人之遗嘱，配偶仍享有不可剥夺的最低继承份额（即“特留分”）。为确保唯一受益人（黑川雪）之绝对权益，委托人于生前将资产逐步洗入本海外离岸信托。该资产在法理上已不再属于“黑川龙之个人遗产”，而归属信托机构所有。即，<span class="highlight-yellow">配偶无论是否向法院提起继承诉讼，均无权触碰或索要本信托内的任何资产。</span>
+                </div>
+
+                <h3>第四条：“无行为能力”指控之风险对冲</h3>
+                <div class="clause">
+                    <span class="clause-title">4.1 虚假用途与法定照护人的“默许”：</span>
+                    鉴于委托人自 2007 年起罹患重度中风与偏瘫，在外界及法定配偶眼中被视为“限制民事行为能力人”。若委托人直接向受益人（黑川雪）账户进行大额转账或设立基金，配偶可随时提交医疗报告，以“无行为能力下的无效操作”为由向法院申请撤销并冻结转账。
+                </div>
+                <div class="clause">
+                    <span class="clause-title">4.2 资金清洗路径之掩护：</span>
+                    为规避上述风险，所有信托注资均伪装成“包养情妇”、“私人奢靡消费”及“特别封口费”，定向汇入代理人（宫崎安奈）账户，再由代理人进行海外离岸清洗。在此期间，<span class="highlight-yellow">配偶为维持其“受害者”身份及掩盖自身不当行为，不仅未对该类大额支出进行法律阻拦，反而多次在公开/私下场合散布、哭诉该笔“情妇包养费”的存在。此种长期纵容与口头确认，已构成法理上的“事实认可”</span>，从而完美切断了其事后以“委托人神志不清”为由申请资金冻结的法律途径。
+                </div>
+
+                <hr style="border: 0; border-top: 1px solid #ccc; margin: 40px 0;">
+
+                <h3>第七条：信托资产触发与紧急熔断机制 (核心指令)</h3>
+                
+                <div class="clause">
+                    <span class="clause-title">7.1 刑事凶杀案触发 (Asset Freeze Clause)：</span><br>
+                    若委托人（黑川龙）死于非命，且案发现场具有任何他杀嫌疑<span class="highlight-red">（如门窗敞开、遭人强行入侵、存在外部暴力干预证据）</span>，依照国际反洗钱与遗产法，本信托基金（二十亿日元）将启动紧急熔断机制，进入**无限期冻结状态**，直至警方与跨国司法机构结案。在此期间，所有相关代理人（宫崎安奈）将强制接受严密的财务审计与跨国谋杀嫌疑调查。
+                </div>
+
+                <div class="clause">
+                    <span class="clause-title">7.2 非刑事死亡触发 (Unconditional Execution)：</span><br>
+                    若委托人死于自然原因、疾病，或被司法机关无争议地判定为自杀<span class="highlight-red">（现场呈现完美密室、无任何外部干预证据）</span>，本信托最终条款将无障碍触发。二十亿日元信托资产将在确认死亡后的 **48 小时内**，全额无条件汇入唯一受益人（黑川雪）的独立账户。任何司法机关、税务机关及配偶，均无权截留或查询。
+                </div>
+
+            </div>
+        </div>
+    </div>
+
+    <div id="mailNotification" class="mail-notification" onclick="openSecureMail()">
+        <div class="noti-header">
+            <div class="noti-badge"><span class="noti-dot"></span>SECURE INBOX</div>
+            <div>刚刚</div>
+        </div>
+        <div class="noti-title">收到一封加密新邮件</div>
+        <div class="noti-desc">来自: a.miyazaki@am-holdings.ch<br>主题: [ DECRYPTED NETWORK ]</div>
+    </div>
+
+    <script>
+        const container = document.querySelector('.pdf-container');
+        const notification = document.getElementById('mailNotification');
+        let triggered = false;
+
+        // 监听滚动事件
+        container.addEventListener('scroll', () => {
+            if (triggered) return;
+
+            // 当滚动条滑动到最底部（允许5像素内的微小误差）时触发
+            const isBottom = container.scrollHeight - container.scrollTop <= container.clientHeight + 5;
+            
+            if (isBottom) {
+                triggered = true;
+                notification.style.display = 'block';
+            }
+        });
+
+        // 点击打开新页签
+        function openSecureMail() {
+            window.open('secure_mail.html', '_blank');
+        }
+    </script>
+
+</body>
+</html>
