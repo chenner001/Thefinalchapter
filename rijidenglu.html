@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Deep Abyss Ink - Terminal Login</title>
+    <style>
+        /* ================= 基础设定：复古 BBS 终端风格 ================= */
+        body {
+            background-color: #000000;
+            color: #aaaaaa;
+            font-family: "Courier New", Courier, "SimSun", monospace; /* 经典等宽字体 */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            overflow: hidden;
+            user-select: none;
+        }
+
+        /* ================= 登录框容器 ================= */
+        .login-terminal {
+            width: 600px;
+            border: 1px dashed #555555;
+            padding: 40px;
+            background-color: #050505;
+            box-shadow: inset 0 0 20px rgba(255, 255, 255, 0.05);
+            position: relative;
+        }
+
+        /* 顶部标题栏 */
+        .terminal-header {
+            text-align: center;
+            border-bottom: 1px solid #333333;
+            padding-bottom: 15px;
+            margin-bottom: 30px;
+            font-weight: bold;
+            letter-spacing: 2px;
+            color: #cccccc;
+        }
+
+        /* ================= 表单排版 ================= */
+        .form-row {
+            margin-bottom: 20px;
+            font-size: 16px;
+            line-height: 1.5;
+            display: flex;
+            align-items: center;
+        }
+
+        .label {
+            display: inline-block;
+            width: 120px;
+            color: #888888;
+        }
+
+        .value {
+            color: #dddddd;
+            letter-spacing: 2px;
+        }
+
+        .hint {
+            color: #666666;
+            font-size: 14px;
+            margin-bottom: 30px;
+            border-left: 2px solid #444;
+            padding-left: 10px;
+            background: rgba(255,255,255,0.02);
+            padding: 5px 10px;
+        }
+
+        /* ================= 密码输入区 ================= */
+        .input-group {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+
+        .input-prompt {
+            color: #aaaaaa;
+            margin-right: 15px;
+        }
+
+        /* 隐藏原生 input 样式，伪装成终端输入 */
+        .pwd-input {
+            background: transparent;
+            border: none;
+            border-bottom: 1px solid #aaaaaa;
+            color: #ffffff;
+            font-family: "Courier New", Courier, monospace;
+            font-size: 18px;
+            width: 80px;
+            text-align: center;
+            letter-spacing: 8px;
+            outline: none;
+        }
+        
+        .pwd-input:focus { border-bottom-color: #ffffff; }
+
+        /* 闪烁光标特效 */
+        .cursor-blink {
+            display: inline-block;
+            width: 8px;
+            height: 18px;
+            background-color: #aaaaaa;
+            margin-left: 5px;
+            animation: blink 1s step-end infinite;
+        }
+        @keyframes blink { 50% { opacity: 0; } }
+
+        /* ================= 系统提示区 ================= */
+        .sys-message {
+            margin-top: 30px;
+            height: 20px;
+            font-size: 14px;
+            letter-spacing: 1px;
+            visibility: hidden;
+        }
+        
+        .sys-message.error {
+            visibility: visible;
+            color: #990000;
+            animation: flash 0.3s 3; /* 报错时连续闪烁 */
+        }
+        
+        .sys-message.success {
+            visibility: visible;
+            color: #aaaaaa;
+            border-left: 3px solid #aaaaaa;
+            padding-left: 10px;
+        }
+
+        @keyframes flash {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0; }
+        }
+
+        /* 幽灵扫描线特效 (增加年代感) */
+        .scanlines {
+            position: absolute;
+            top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(to bottom, rgba(255,255,255,0), rgba(255,255,255,0) 50%, rgba(0,0,0,0.1) 50%, rgba(0,0,0,0.1));
+            background-size: 100% 4px;
+            pointer-events: none;
+            z-index: 50;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="login-terminal" onclick="document.getElementById('pwd').focus()">
+        <div class="scanlines"></div>
+        
+        <div class="terminal-header">
+            SYSTEM LOGIN // DEEP ABYSS INK BBS
+        </div>
+
+        <div class="form-row">
+            <span class="label">账 号：</span>
+            <span class="value" id="account-display">无名之羽</span>
+        </div>
+
+        <div class="hint">
+            [ 密码提示：你生命中最重要的一天 (MMDD) ]
+        </div>
+
+        <div class="input-group">
+            <span class="input-prompt">请输入四位数字 ></span>
+            <input type="password" id="pwd" class="pwd-input" maxlength="4" autocomplete="off" autofocus>
+            <span class="cursor-blink"></span>
+        </div>
+
+        <div class="sys-message" id="sys-msg"></div>
+    </div>
+
+    <script>
+        const SECRETS = {
+            // "
+            _pwd_hash: "MTIyMV9zeXN0ZW1fa2V5" 
+        };
+
+        const pwdInput = document.getElementById('pwd');
+        const sysMsg = document.getElementById('sys-msg');
+
+        // 限制只能输入数字
+        pwdInput.addEventListener('input', function(e) {
+            this.value = this.value.replace(/[^0-9]/g, '');
+        });
+
+        // 监听回车键进行验证
+        pwdInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') {
+                verifyAccess();
+            }
+        });
+
+        function verifyAccess() {
+            const rawVal = pwdInput.value;
+            
+            // 为输入值加上盐值（Salt）后进行编码比对，防止直接在代码里看到 ""
+            const attemptHash = btoa(rawVal + "_system_key");
+
+            sysMsg.className = "sys-message"; // 重置样式
+
+            if (attemptHash === SECRETS._pwd_hash) {
+                // 密码正确：静默通过，准备跳转
+                pwdInput.disabled = true;
+                sysMsg.textContent = "VERIFIED. 正在建立安全连接...";
+                sysMsg.classList.add("success");
+                
+                // 1.5秒后自动跳转到私密日记
+                setTimeout(() => {
+                    window.location.href = "riji.html";
+                }, 1500);
+            } else {
+                // 密码错误：报错并清空输入框
+                sysMsg.textContent = "ACCESS DENIED: 密码错误。";
+                sysMsg.classList.add("error");
+                
+                setTimeout(() => {
+                    pwdInput.value = "";
+                    sysMsg.classList.remove("error");
+                    pwdInput.focus();
+                }, 1000);
+            }
+        }
+    </script>
+
+</body>
+</html>

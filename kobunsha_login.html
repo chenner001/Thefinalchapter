@@ -1,0 +1,301 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ログイン - 光文社 匿名社員コミュニティ</title>
+    <style>
+        /* ================= 基础重置与企业内网风格 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        
+        body, html {
+            width: 100%; height: 100%;
+            background-color: #eef2f5;
+            font-family: "Meiryo", "Hiragino Kaku Gothic ProN", "Microsoft YaHei", sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        /* 背景的企业装饰几何图形 */
+        .bg-shapes {
+            position: fixed; inset: 0; z-index: 0; pointer-events: none; overflow: hidden;
+        }
+        .bg-shapes div {
+            position: absolute;
+            background: linear-gradient(135deg, rgba(20, 80, 150, 0.05) 0%, rgba(20, 80, 150, 0) 100%);
+            border-radius: 50%;
+        }
+        .shape1 { width: 800px; height: 800px; top: -300px; left: -200px; }
+        .shape2 { width: 600px; height: 600px; bottom: -200px; right: -100px; }
+
+        /* ================= 登录框主体 ================= */
+        .login-container {
+            width: 90%; max-width: 420px;
+            background-color: #ffffff;
+            border-radius: 8px;
+            box-shadow: 0 10px 30px rgba(0, 30, 60, 0.08), 0 1px 3px rgba(0,0,0,0.05);
+            padding: 40px;
+            z-index: 10;
+            position: relative;
+        }
+
+        /* 顶部 Logo 与 标题 */
+        .logo-box {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo-text {
+            font-size: 24px;
+            font-weight: 900;
+            color: #0b3d7a;
+            letter-spacing: 1px;
+            margin-bottom: 8px;
+        }
+        .sys-name {
+            font-size: 13px;
+            color: #666;
+            letter-spacing: 0.5px;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 20px;
+        }
+
+        /* 表单区域 */
+        .form-group { margin-bottom: 20px; position: relative; }
+        .form-group label {
+            display: block;
+            font-size: 13px;
+            color: #333;
+            font-weight: bold;
+            margin-bottom: 8px;
+        }
+        
+        .input-wrapper {
+            position: relative;
+            display: flex;
+            align-items: center;
+        }
+        .form-group input {
+            width: 100%;
+            height: 44px;
+            border: 1px solid #ccd6e0;
+            border-radius: 4px;
+            padding: 0 35px 0 15px; /* 右侧留出空间给对勾/叉号 */
+            font-size: 15px;
+            color: #333;
+            transition: all 0.2s ease;
+            background-color: #fafbfc;
+        }
+        .form-group input:focus {
+            outline: none;
+            border-color: #0b3d7a;
+            box-shadow: 0 0 0 3px rgba(11, 61, 122, 0.1);
+            background-color: #fff;
+        }
+
+        /* 实时校验反馈图标 */
+        .status-icon {
+            position: absolute;
+            right: 12px;
+            font-size: 14px;
+            display: none;
+        }
+        .status-icon.valid { color: #27c93f; display: block; }
+        .status-icon.invalid { color: #ff5f56; display: block; }
+
+        /* 密保提示按钮与文本 */
+        .hint-btn {
+            background: none; border: none;
+            color: #5a7698; font-size: 12px;
+            cursor: pointer; padding: 0; margin-top: 8px;
+            text-decoration: underline;
+        }
+        .hint-btn:hover { color: #0b3d7a; }
+        
+        .hint-text {
+            display: none; /* 初始隐藏 */
+            font-size: 12px;
+            color: #d93025;
+            background: rgba(217, 48, 37, 0.05);
+            padding: 8px 10px;
+            border-left: 3px solid #d93025;
+            margin-top: 8px;
+            animation: fadeIn 0.3s ease;
+        }
+        @keyframes fadeIn { from { opacity: 0; transform: translateY(-5px); } to { opacity: 1; transform: translateY(0); } }
+
+        /* 登录按钮 */
+        .login-btn {
+            width: 100%;
+            height: 48px;
+            background-color: #0b3d7a;
+            color: #fff;
+            border: none;
+            border-radius: 4px;
+            font-size: 15px;
+            font-weight: bold;
+            cursor: pointer;
+            transition: background-color 0.2s ease;
+            margin-top: 15px;
+        }
+        .login-btn:hover { background-color: #092c59; }
+
+        /* 错误提示框 */
+        .error-msg {
+            color: #d93025;
+            background-color: #fce8e6;
+            border-radius: 4px;
+            padding: 10px 15px;
+            font-size: 13px;
+            margin-bottom: 20px;
+            display: none; 
+            align-items: center;
+            border-left: 3px solid #d93025;
+        }
+        .error-msg.show { display: flex; }
+
+        /* 底部警示语 */
+        .footer-warning {
+            margin-top: 25px;
+            text-align: center;
+            font-size: 11px;
+            color: #888;
+            line-height: 1.5;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="bg-shapes">
+        <div class="shape1"></div>
+        <div class="shape2"></div>
+    </div>
+
+    <div class="login-container">
+        <div class="logo-box">
+            <div class="logo-text">KOBUNSHA</div>
+            <div class="sys-name">光文社 匿名社員コミュニティ (Beta)</div>
+        </div>
+
+        <div class="error-msg" id="errorMsg">
+            ⚠️ ユーザーID、またはパスワードが違います。<br>（账号或密码错误，请重试。）
+        </div>
+
+        <div class="form-group">
+            <label for="accInput">社員ID / アカウント (Account)</label>
+            <div class="input-wrapper">
+                <input type="text" id="accInput" autocomplete="off" spellcheck="false" placeholder="例: t.yamada">
+                <span class="status-icon" id="accStatus"></span>
+            </div>
+        </div>
+
+        <div class="form-group">
+            <label for="pwdInput">パスワード (Password)</label>
+            <div class="input-wrapper">
+                <input type="password" id="pwdInput" placeholder="••••••••" maxlength="8">
+            </div>
+            <button class="hint-btn" id="hintBtn" type="button">パスワードを忘れた場合 (密保提示)</button>
+            <div class="hint-text" id="hintText">提示：最重要的人 + 最重要的年份（NAMEYYYY）</div>
+        </div>
+
+        <button class="login-btn" id="loginBtn">ログイン (Login)</button>
+
+        <div class="footer-warning">
+            ※ 本システムは光文社内部専用です。<br>
+            許可のないアクセス、または情報の外部漏洩は、<br>法的に罰せられる可能性があります。
+        </div>
+    </div>
+
+    <script>
+        // ================= 极客级暗文验证逻辑 =================
+        // 目标账号的 ASCII 码 (对应纯小写的: r.kurokawa)
+        const targetAcc = [114, 46, 107, 117, 114, 111, 107, 97, 119, 97];
+        
+        // 目标密码的 ASCII 码 (对应纯小写的: yuki1995)
+        const targetPwd = [121, 117, 107, 105, 49, 57, 57, 53];
+
+        // 统一转为小写后校验，实现不区分大小写
+        function verify(inputString, targetArray) {
+            const lowerStr = inputString.toLowerCase(); // 转换为小写
+            if (lowerStr.length !== targetArray.length) return false;
+            for (let i = 0; i < lowerStr.length; i++) {
+                if (lowerStr.charCodeAt(i) !== targetArray[i]) {
+                    return false;
+                }
+            }
+            return true;
+        }
+
+        // ================= DOM 元素 =================
+        const accInput = document.getElementById('accInput');
+        const pwdInput = document.getElementById('pwdInput');
+        const accStatus = document.getElementById('accStatus');
+        const loginBtn = document.getElementById('loginBtn');
+        const errorMsg = document.getElementById('errorMsg');
+        const hintBtn = document.getElementById('hintBtn');
+        const hintText = document.getElementById('hintText');
+
+        // ================= 账号输入实时校验反馈 =================
+        accInput.addEventListener('input', () => {
+            const acc = accInput.value.trim();
+            if (acc.length === 0) {
+                accStatus.className = 'status-icon'; // 隐藏图标
+                accStatus.innerHTML = '';
+            } else if (verify(acc, targetAcc)) {
+                accStatus.className = 'status-icon valid';
+                accStatus.innerHTML = '✔️'; // 账号正确
+            } else {
+                accStatus.className = 'status-icon invalid';
+                accStatus.innerHTML = '❌'; // 账号错误
+            }
+        });
+
+        // ================= 显示密保提示 =================
+        hintBtn.addEventListener('click', () => {
+            if (hintText.style.display === 'block') {
+                hintText.style.display = 'none';
+            } else {
+                hintText.style.display = 'block';
+            }
+        });
+
+        // ================= 登录验证 =================
+        function attemptLogin() {
+            const acc = accInput.value.trim();
+            const pwd = pwdInput.value.trim();
+
+            if (verify(acc, targetAcc) && verify(pwd, targetPwd)) {
+                // 验证成功
+                errorMsg.classList.remove('show');
+                loginBtn.style.backgroundColor = '#27c93f'; 
+                loginBtn.innerText = '認証成功 (Success)';
+                
+                // 延迟跳转到匿名社区页面
+                setTimeout(() => {
+                    window.location.href = 'niming.html';
+                }, 800);
+            } else {
+                // 验证失败
+                errorMsg.classList.add('show');
+                pwdInput.value = '';
+                
+                // 按钮抖动动画
+                loginBtn.style.transform = 'translate(-3px, 0)';
+                setTimeout(() => loginBtn.style.transform = 'translate(3px, 0)', 50);
+                setTimeout(() => loginBtn.style.transform = 'translate(-3px, 0)', 100);
+                setTimeout(() => loginBtn.style.transform = 'translate(0, 0)', 150);
+            }
+        }
+
+        loginBtn.addEventListener('click', attemptLogin);
+
+        pwdInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') attemptLogin();
+        });
+        
+        accInput.addEventListener('keypress', function(e) {
+            if (e.key === 'Enter') pwdInput.focus();
+        });
+    </script>
+</body>
+</html>

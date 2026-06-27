@@ -1,0 +1,235 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LIVE FEED - THE CROWN OF DECEIT</title>
+    <style>
+        /* ================= 基础重置 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            font-family: "Helvetica Neue", Helvetica, Arial, sans-serif;
+            color: #fff;
+        }
+
+        /* ================= 极客终端切入动画 (Terminal) ================= */
+        #terminal-layer {
+            position: absolute; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            background-color: #050505;
+            z-index: 9999;
+            padding: 40px;
+            font-family: "Courier New", Courier, monospace;
+            color: #34d399; /* 黑客绿 */
+            font-size: 15px;
+            line-height: 1.8;
+            display: flex;
+            flex-direction: column;
+            transition: opacity 0.3s ease;
+        }
+        .term-line { opacity: 0; margin-bottom: 8px; text-shadow: 0 0 5px rgba(52, 211, 153, 0.5); }
+        .term-cursor { display: inline-block; width: 8px; height: 15px; background-color: #34d399; animation: blink 1s step-end infinite; }
+        @keyframes blink { 0%, 100% { opacity: 1; } 50% { opacity: 0; } }
+
+        /* ================= 监视器导播台边框 ================= */
+        #monitor-layer {
+            position: absolute; top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            padding: 30px;
+            background-color: #111;
+            display: none; /* 终端运行完后显示 */
+            flex-direction: column;
+        }
+        
+        .monitor-frame {
+            position: relative;
+            flex: 1;
+            border: 4px solid #2a2a2a;
+            border-radius: 8px;
+            background-color: #000;
+            overflow: hidden;
+            box-shadow: 
+                inset 0 0 20px #000, 
+                0 0 0 10px #1a1a1a, 
+                0 10px 30px rgba(0,0,0,0.8);
+        }
+
+        /* 导播台 UI 装饰 */
+        .broadcast-ui {
+            position: absolute; top: 20px; left: 20px; right: 20px;
+            display: flex; justify-content: space-between;
+            z-index: 50; pointer-events: none;
+            font-family: "Courier New", Courier, monospace;
+            font-weight: bold; font-size: 18px; text-shadow: 1px 1px 2px #000;
+        }
+        .live-indicator { display: flex; align-items: center; color: #ff3333; }
+        .live-dot { width: 12px; height: 12px; background-color: #ff3333; border-radius: 50%; margin-right: 8px; animation: blink 1.5s infinite; box-shadow: 0 0 10px #ff3333; }
+        .cam-info { color: #fff; letter-spacing: 2px; }
+
+        /* ================= 现场画面与特效 ================= */
+        .feed-image {
+            width: 100%; height: 100%;
+            object-fit: cover; /* 让图片铺满监视器 */
+            filter: contrast(1.1) brightness(0.9);
+        }
+
+        /* CRT 扫描线特效 (增加监视器质感) */
+        .scanlines {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 20; pointer-events: none;
+        }
+
+        /* 记者群闪光灯特效 */
+        .flash-layer {
+            position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+            background-color: #fff; opacity: 0; z-index: 30; pointer-events: none;
+            mix-blend-mode: overlay;
+        }
+        .flash-1 { animation: paparazzi 4s infinite 0.5s; }
+        .flash-2 { animation: paparazzi 3.5s infinite 1.2s; }
+        .flash-3 { animation: paparazzi 5s infinite 2.8s; }
+
+        @keyframes paparazzi {
+            0%, 95% { opacity: 0; }
+            96% { opacity: 0.7; }
+            97% { opacity: 0; }
+            98% { opacity: 0.9; }
+            100% { opacity: 0; }
+        }
+
+        /* ================= 虚伪致辞字幕 ================= */
+        .subtitle-container {
+            position: absolute; bottom: 40px; left: 0; width: 100%;
+            display: flex; justify-content: center;
+            z-index: 40; pointer-events: none;
+        }
+        .subtitle-text {
+            background-color: rgba(0, 0, 0, 0.75);
+            color: #fef08a; /* 转播常用的亮黄色 */
+            padding: 12px 30px;
+            font-size: 22px;
+            font-family: "Noto Serif CJK SC", "Songti SC", serif;
+            letter-spacing: 2px;
+            text-align: center;
+            border-left: 4px solid #fef08a;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.5);
+            max-width: 80%;
+            /* 切换动画 */
+            opacity: 0; transform: translateY(10px);
+            transition: opacity 0.5s ease, transform 0.5s ease;
+        }
+        .subtitle-text.show { opacity: 1; transform: translateY(0); }
+
+    </style>
+</head>
+<body>
+
+    <div id="terminal-layer">
+        <div class="term-line" id="line1">> [SYSTEM TIME] 2026-06-25 09:59:50 AM JST</div>
+        <div class="term-line" id="line2">> [TASK] INITIATING PROTOCOL: CROWN_OF_DECEIT</div>
+        <div class="term-line" id="line3">> [BYPASS] BYPASSING TEITO HOTEL SECURITY FIREWALL... OK.</div>
+        <div class="term-line" id="line4">> [OVERRIDE] OVERRIDING MAIN STAGE DISPLAY PROJECTION... SUCCESS.</div>
+        <div class="term-line" id="line5">> [FEED] CONNECTING TO LIVE BROADCAST CAM_01... <span class="term-cursor"></span></div>
+    </div>
+
+    <div id="monitor-layer">
+        <div class="monitor-frame">
+            <img src="虚妄之冕.png" alt="发布会现场" class="feed-image">
+            
+            <div class="broadcast-ui">
+                <div class="live-indicator"><div class="live-dot"></div>LIVE BROADCAST</div>
+                <div class="cam-info">CAM-01 / STAGE CENTER</div>
+            </div>
+
+            <div class="scanlines"></div>
+            <div class="flash-layer flash-1"></div>
+            <div class="flash-layer flash-2"></div>
+            <div class="flash-layer flash-3"></div>
+
+            <div class="subtitle-container">
+                <div class="subtitle-text" id="subtitle"></div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // ================= 终端运行序列 =================
+        const termLines = [
+            document.getElementById('line1'),
+            document.getElementById('line2'),
+            document.getElementById('line3'),
+            document.getElementById('line4'),
+            document.getElementById('line5')
+        ];
+        const terminalLayer = document.getElementById('terminal-layer');
+        const monitorLayer = document.getElementById('monitor-layer');
+
+        // 模拟代码逐行打印
+        let delay = 500;
+        termLines.forEach((line, index) => {
+            setTimeout(() => {
+                line.style.opacity = 1;
+                // 打印完最后一行后，闪烁一下切入画面
+                if (index === termLines.length - 1) {
+                    setTimeout(() => {
+                        terminalLayer.style.opacity = 0;
+                        setTimeout(() => {
+                            terminalLayer.style.display = 'none';
+                            monitorLayer.style.display = 'flex';
+                            startSubtitles(); // 画面出来后开始滚动字幕
+                        }, 300);
+                    }, 1200);
+                }
+            }, delay);
+            delay += 600 + Math.random() * 400; // 模拟真实处理延迟
+        });
+
+
+        // ================= 虚伪致辞字幕序列 =================
+        const quotes = [
+            "各位媒体朋友，感谢大家今天能来到这里……",
+            "老师的突然离世，让我和百合师母都陷入了深深的悲恸之中。",
+            "《虚妄之冕》是他一生的心血，也是他留给这个世界最后的瑰宝。",
+            "在老师生命的最后阶段，他甚至无法握笔……",
+            "是我日夜守在病榻前，听着他艰难的口述，替他敲下这书里的每一个字。",
+            "他曾紧紧拉着我的手说：‘健司，代替我，把黑川文学的火焰传递下去吧。’",
+            "今天，我站在这里，不仅是为了发布这本绝笔之作……",
+            "更是为了继承他的遗志，代他成为新一代的——"
+        ];
+
+        const subtitleElement = document.getElementById('subtitle');
+        let currentQuoteIndex = 0;
+
+        function showNextQuote() {
+            if (currentQuoteIndex >= quotes.length) {
+                // 字幕播放完毕，触发突发劫持，跳转至处刑页面
+                window.location.href = 'screen.html';
+                return;
+            }
+
+            // 淡出上一句
+            subtitleElement.classList.remove('show');
+            
+            setTimeout(() => {
+                // 替换文本并淡入下一句
+                subtitleElement.innerText = `“${quotes[currentQuoteIndex]}”`;
+                subtitleElement.classList.add('show');
+                currentQuoteIndex++;
+                
+                // 每句话停留 4 秒
+                setTimeout(showNextQuote, 4000);
+            }, 600); // 留出 0.6 秒的换句空白
+        }
+
+        function startSubtitles() {
+            // 给玩家 2 秒钟适应画面和闪光灯后，伊藤开始讲话
+            setTimeout(showNextQuote, 2000);
+        }
+    </script>
+</body>
+</html>

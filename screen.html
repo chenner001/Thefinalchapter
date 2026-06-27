@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>OVERRIDE - THE TRUE CROWN</title>
+    <style>
+        /* ================= 基础设定 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            background-color: #000;
+            overflow: hidden;
+            font-family: "Noto Serif CJK SC", "Songti SC", "Times New Roman", serif;
+            color: #fff;
+        }
+
+        /* ================= 阶段 1：信号劫持与故障闪烁 (Glitch) ================= */
+        #hijack-layer {
+            position: fixed; inset: 0;
+            background-color: #000;
+            z-index: 9999;
+            display: flex; flex-direction: column; justify-content: center; align-items: center;
+        }
+
+        .warning-text {
+            font-family: "Courier New", Courier, monospace;
+            color: #ff0000;
+            font-size: 3vw;
+            font-weight: bold;
+            letter-spacing: 5px;
+            text-shadow: 0 0 20px #ff0000;
+            opacity: 0;
+        }
+
+        /* 狂暴的视觉撕裂与闪屏 */
+        .glitch-active {
+            animation: violentFlash 1.5s steps(2, end) forwards;
+        }
+
+        @keyframes violentFlash {
+            0% { background-color: #000; filter: invert(0); }
+            10% { background-color: #fff; filter: invert(1) hue-rotate(90deg); }
+            20% { background-color: #f00; transform: scale(1.1) skew(5deg); }
+            30% { background-color: #000; transform: scale(1) skew(0); }
+            40% { background-color: #fff; filter: invert(1); }
+            45% { background-color: #0f0; transform: translate(20px, -20px); }
+            50% { background-color: #000; transform: translate(0, 0); }
+            60% { background-color: #00f; }
+            70% { background-color: #fff; filter: invert(1); }
+            80% { background-color: #000; }
+            90% { background-color: #fff; transform: scale(1.05); }
+            100% { background-color: transparent; opacity: 0; pointer-events: none; }
+        }
+
+        /* ================= 阶段 2：现场大屏幕视角 (主画面) ================= */
+        #big-screen-layer {
+            position: fixed; inset: 0;
+            z-index: 10;
+            opacity: 0; /* 故障结束后显现 */
+        }
+
+        /* 雪的巨型凝视 */
+        .yuki-image {
+            width: 100%; height: 100%;
+            object-fit: cover; /* 铺满整个屏幕 */
+            object-position: center top;
+            filter: contrast(1.1) brightness(0.85) grayscale(0.2); /* 营造清冷、压抑的质感 */
+            transform: scale(1.05); /* 缓慢放大的压迫感 */
+            transition: transform 30s ease-out;
+        }
+        
+        .zooming {
+            transform: scale(1);
+        }
+
+        /* 大屏幕的物理质感：LED 像素网格与扫描线 */
+        .led-overlay {
+            position: absolute; inset: 0;
+            background-image: 
+                linear-gradient(rgba(0, 0, 0, 0) 50%, rgba(0, 0, 0, 0.2) 50%),
+                linear-gradient(90deg, rgba(255, 0, 0, 0.03), rgba(0, 255, 0, 0.01), rgba(0, 0, 255, 0.03));
+            background-size: 100% 4px, 3px 100%;
+            z-index: 20; pointer-events: none;
+        }
+
+        /* 屏幕四周的暗角，凸显中央的雪 */
+        .vignette {
+            position: absolute; inset: 0;
+            background: radial-gradient(circle at center, transparent 40%, rgba(0,0,0,0.85) 100%);
+            z-index: 30; pointer-events: none;
+        }
+
+        /* ================= 阶段 3：处刑字幕 ================= */
+        #subtitle-container {
+            position: absolute; bottom: 12%; left: 0; width: 100%;
+            display: flex; flex-direction: column; align-items: center;
+            z-index: 50;
+        }
+
+        .subtitle {
+            font-size: 3vw; /* 响应式巨型字体 */
+            font-weight: 900;
+            color: #ffffff;
+            text-align: center;
+            max-width: 90%;
+            letter-spacing: 3px;
+            /* 极其沉重的阴影，确保在任何画面下都清晰且锐利 */
+            text-shadow: 
+                0 0 10px rgba(0,0,0,1),
+                0 0 20px rgba(0,0,0,1),
+                3px 3px 0px #000,
+                -1px -1px 0px rgba(255,0,0,0.5); /* 边缘带有一丝微弱的血光 */
+            
+            opacity: 0;
+            transform: translateY(20px) scale(0.95);
+            transition: opacity 0.8s ease-out, transform 0.8s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            position: absolute; /* 让句子在同一位置替换 */
+        }
+
+        .subtitle.active {
+            opacity: 1;
+            transform: translateY(0) scale(1);
+        }
+
+        /* 针对最后一句的特殊样式（绝杀） */
+        .subtitle.final-blow {
+            color: #ff3333;
+            font-size: 4vw;
+            text-shadow: 0 0 30px rgba(255,0,0,0.8), 3px 3px 0px #000;
+        }
+
+        /* ================= 全屏转场：渐渐变黑的遮罩层 ================= */
+        .fade-out-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            z-index: 99999; /* 保证在所有层级之上 */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 3s ease-in-out; /* 3秒平滑陷入黑暗 */
+        }
+        
+        /* 激活黑屏 */
+        .fade-out-overlay.active {
+            opacity: 1;
+        }
+
+    </style>
+</head>
+<body>
+
+    <div class="fade-out-overlay" id="fadeOverlay"></div>
+
+    <div id="hijack-layer">
+        <div class="warning-text" id="warn-text">INCOMING OVERRIDE SIGNAL...</div>
+    </div>
+
+    <div id="big-screen-layer">
+        <img src="黑川雪.png" alt="Yuki" class="yuki-image" id="yuki-img">
+        <div class="led-overlay"></div>
+        <div class="vignette"></div>
+        
+        <div id="subtitle-container">
+            </div>
+    </div>
+
+    <script>
+        // ================= 剧情台词序列 =================
+        const scriptLines = [
+            { text: "各位媒体朋友，别急着鼓掌。", duration: 3000 },
+            { text: "伊藤叔叔，那本沾着我父亲脑浆的《虚妄之冕》……", duration: 4000 },
+            { text: "好用吗？", duration: 3000 },
+            { text: "还有妈妈，为了区区五百万日元把我像垃圾一样卖掉……", duration: 4500 },
+            { text: "真是辛苦你们的算计了。", duration: 3500 },
+            { text: "只可惜，父亲的离岸信托熔断机制已被触发。", duration: 4500 },
+            { text: "那二十亿日元，你们一分钱也拿不到。", duration: 4000 },
+            { text: "此时此刻，你们在书房合谋杀人的录音……", duration: 4000 },
+            { text: "已经同步发送给了台下的每一位记者，以及警视厅。", duration: 5000 },
+            { text: "带着这顶由谎言编织的王冠……", duration: 4000 },
+            { text: "去地狱里慢慢腐烂吧。", duration: 6000, isFinal: true }
+        ];
+
+        // ================= DOM 元素 =================
+        const hijackLayer = document.getElementById('hijack-layer');
+        const warnText = document.getElementById('warn-text');
+        const bigScreenLayer = document.getElementById('big-screen-layer');
+        const yukiImg = document.getElementById('yuki-img');
+        const subtitleContainer = document.getElementById('subtitle-container');
+        const fadeOverlay = document.getElementById('fadeOverlay');
+
+        // ================= 动画序列控制器 =================
+        
+        // 1. 启动劫持警告
+        setTimeout(() => {
+            warnText.style.opacity = 1;
+            
+            // 2. 触发狂暴闪屏
+            setTimeout(() => {
+                warnText.style.display = 'none';
+                hijackLayer.classList.add('glitch-active');
+                
+                // 3. 撕裂结束，大屏幕瞬间亮起
+                setTimeout(() => {
+                    bigScreenLayer.style.opacity = 1;
+                    yukiImg.classList.add('zooming'); // 启动缓慢推镜头效果
+                    
+                    // 4. 开始播放控诉字幕
+                    setTimeout(playSubtitles, 2000); // 留出 2 秒让玩家感受这令人窒息的对视
+                    
+                }, 1500); // 闪屏动画持续 1.5s
+                
+            }, 1500); // 警告字停留 1.5s
+
+        }, 500); // 页面加载后 0.5s 开始
+
+        // ================= 字幕播放引擎 =================
+        let currentLine = 0;
+        let currentSubtitleElement = null;
+
+        function playSubtitles() {
+            if (currentLine >= scriptLines.length) {
+                // 字幕已经全部播放完毕，启动3秒渐黑动画
+                fadeOverlay.classList.add('active');
+                
+                // 3秒黑屏结束后跳转到新闻页面
+                setTimeout(() => {
+                    window.location.href = 'newsdark.html';
+                }, 3000);
+                return;
+            }
+
+            const lineData = scriptLines[currentLine];
+            
+            // 移除上一句
+            if (currentSubtitleElement) {
+                currentSubtitleElement.classList.remove('active');
+                // 等待淡出后再从 DOM 移除
+                setTimeout((el) => el.remove(), 800, currentSubtitleElement);
+            }
+
+            // 创建新的一句
+            const newSubtitle = document.createElement('div');
+            newSubtitle.className = 'subtitle';
+            newSubtitle.innerText = lineData.text;
+            if (lineData.isFinal) {
+                newSubtitle.classList.add('final-blow');
+            }
+            
+            subtitleContainer.appendChild(newSubtitle);
+            
+            // 强制重绘以触发 transition
+            void newSubtitle.offsetWidth; 
+            
+            // 淡入
+            newSubtitle.classList.add('active');
+            currentSubtitleElement = newSubtitle;
+
+            // 推进到下一句
+            currentLine++;
+            setTimeout(playSubtitles, lineData.duration);
+        }
+    </script>
+</body>
+</html>

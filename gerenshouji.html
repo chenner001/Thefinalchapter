@@ -1,0 +1,303 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>伊藤健司の个人手记 - 仰望星空的日常</title>
+    <style>
+        /* ================= 老旧博客风格重置 ================= */
+        body {
+            background-color: #e9e6d3; /* 经典的泛黄/米色背景 */
+            font-family: "MS PGothic", "SimSun", "宋体", serif; /* 使用偏老旧的字体 */
+            color: #333;
+            margin: 0;
+            padding: 0;
+            line-height: 1.8;
+        }
+
+        /* ================= 模拟浏览器顶栏 ================= */
+        .browser-header {
+            background: #d4d0c8; /* 经典的 Windows 98/XP 灰色 */
+            padding: 8px 15px;
+            display: flex;
+            align-items: center;
+            border-bottom: 2px solid #888;
+        }
+        .browser-url {
+            background: #fff;
+            padding: 3px 10px;
+            border: 1px inset #ccc;
+            font-size: 12px;
+            color: #555;
+            width: 100%;
+            max-width: 600px;
+            font-family: monospace;
+        }
+
+        /* ================= 博客主体布局 ================= */
+        .blog-wrapper {
+            width: 900px;
+            margin: 30px auto;
+            background: #fff;
+            border: 1px solid #ccc;
+            box-shadow: 2px 2px 10px rgba(0,0,0,0.1);
+        }
+
+        /* 博客页眉 */
+        .blog-header {
+            background-color: #5c6b73;
+            color: #fff;
+            padding: 40px 30px;
+            text-align: left;
+            border-bottom: 4px solid #3a4449;
+        }
+        .blog-header h1 {
+            margin: 0 0 10px 0;
+            font-size: 26px;
+            font-weight: normal;
+            letter-spacing: 2px;
+        }
+        .blog-header p {
+            margin: 0;
+            font-size: 13px;
+            color: #c9d1d6;
+        }
+
+        /* 内容区（左右分栏） */
+        .blog-content {
+            display: flex;
+        }
+
+        /* 左侧：文章列表 */
+        .main-column {
+            width: 70%;
+            padding: 30px;
+            border-right: 1px dashed #ccc;
+        }
+
+        .post {
+            margin-bottom: 50px;
+        }
+        .post-date {
+            font-size: 12px;
+            color: #888;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 5px;
+            margin-bottom: 10px;
+        }
+        .post-title {
+            font-size: 18px;
+            color: #004488;
+            margin: 0 0 15px 0;
+        }
+        .post-body {
+            font-size: 14px;
+            color: #444;
+            text-align: justify;
+        }
+        .post-body p {
+            margin-bottom: 15px;
+            text-indent: 2em; /* 首行缩进，增加老式排版感 */
+        }
+        .post-footer {
+            text-align: right;
+            font-size: 12px;
+            color: #999;
+            margin-top: 10px;
+        }
+
+        /* 关键线索高亮区 (玩家视角下会注意到这个词) */
+        .clue-keyword {
+            font-weight: bold;
+            color: #cc0000;
+            background-color: rgba(204, 0, 0, 0.05);
+            padding: 0 4px;
+            cursor: help;
+        }
+
+        /* 右侧：侧边栏 (头像所在位置) */
+        .sidebar {
+            width: 30%;
+            padding: 20px;
+            background-color: #fcfcfc;
+        }
+
+        /* 个人简介模块 */
+        .profile-widget {
+            text-align: center;
+            margin-bottom: 30px;
+            border: 1px solid #ddd;
+            padding: 15px;
+            background: #fff;
+        }
+        .profile-title {
+            font-size: 14px;
+            font-weight: bold;
+            background: #eee;
+            padding: 5px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid #ccc;
+        }
+        
+        /* 头像与细节 */
+        .profile-avatar {
+            width: 140px;
+            height: 180px;
+            object-fit: cover;
+            border: 3px double #999;
+            margin-bottom: 10px;
+            /* 提示：廉价西装上别着名贵钢笔 */
+            position: relative;
+        }
+        .profile-name {
+            font-weight: bold;
+            font-size: 15px;
+            color: #333;
+            margin-bottom: 5px;
+        }
+        .profile-desc {
+            font-size: 12px;
+            color: #666;
+            text-align: left;
+            line-height: 1.6;
+            margin-top: 10px;
+        }
+
+        /* 老式博客挂件 */
+        .widget {
+            margin-bottom: 25px;
+        }
+        .widget-header {
+            font-size: 13px;
+            font-weight: bold;
+            color: #555;
+            border-left: 4px solid #5c6b73;
+            padding-left: 8px;
+            margin-bottom: 10px;
+        }
+        .widget-list {
+            list-style: square inside;
+            padding: 0;
+            margin: 0;
+            font-size: 12px;
+            color: #004488;
+        }
+        .widget-list li {
+            margin-bottom: 5px;
+            cursor: pointer;
+        }
+        .widget-list li:hover {
+            text-decoration: underline;
+        }
+        
+        /* 访问量计数器 (复古元素) */
+        .hit-counter {
+            font-family: 'Courier New', Courier, monospace;
+            background: #000;
+            color: #0f0;
+            padding: 2px 5px;
+            letter-spacing: 2px;
+            font-size: 14px;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶层模拟浏览器 UI -->
+    <div class="browser-header">
+        <div class="browser-url">http://blog.fc2.jp/ito_kenji_official/</div>
+    </div>
+
+    <div class="blog-wrapper">
+        <!-- 博客页眉 -->
+        <div class="blog-header">
+            <h1>伊藤健司の个人手记</h1>
+            <p>—— 仰望星空的日常。记录作为黑川老师助手的心路历程。</p>
+        </div>
+
+        <div class="blog-content">
+            <!-- 左侧：文章内容 -->
+            <div class="main-column">
+                
+                <!-- 文章 1 -->
+                <div class="post">
+                    <div class="post-date">2026-06-15 21:40</div>
+                    <h2 class="post-title">又是一次震撼的构思！</h2>
+                    <div class="post-body">
+                        <p>今天晚上，再次协助黑川老师整理了下一部作品的初版大纲。老师的新作构思实在是太令人惊叹了！那种对人性幽暗面的无情剖析，那种将诡计与动机完美融合的手法，简直是我辈楷模！</p>
+                        <p>哪怕我只是在旁边做一些微不足道的端茶倒水、文字录入的记录工作，我都感到无比光荣。老师就是日本推理界永远不落的太阳，而我，只要能做照亮这轮太阳的萤火虫，就已经足够了。</p>
+                    </div>
+                    <div class="post-footer">评论 (0) | 浏览 (12)</div>
+                </div>
+
+                <!-- 文章 2 -->
+                <div class="post">
+                    <div class="post-date">2026-05-28 14:15</div>
+                    <h2 class="post-title">整理书房的感悟</h2>
+                    <div class="post-body">
+                        <p>上午师母不在家，我独自帮老师整理了地下室和书房。看着那一排排摆在玻璃柜里的国家文学奖杯和证书，我深深感到了自己的渺小与无力。</p>
+                        <p>有些人注定是站在光里的天才。而我这样资质平庸的人，只要能替老师分担一些繁杂的琐事，让他能安心地、毫无顾忌地创作出伟大的作品，就已经体现了我这辈子最大的价值。老师的伟大，就是我的光荣。</p>
+                    </div>
+                    <div class="post-footer">评论 (0) | 浏览 (8)</div>
+                </div>
+
+                <!-- 文章 3 (关键线索文章) -->
+                <div class="post">
+                    <div class="post-date">2026-05-10 23:05</div>
+                    <h2 class="post-title">偶尔的怀旧与自省</h2>
+                    <div class="post-body">
+                        <p>下午在地下储藏室的最深处找旧剪报时，偶然翻到了自己十多年前，还在读大学时写的一篇短篇废稿。想起那时候，不知天高地厚的我，还曾用“无名之羽”这个网名，在地下文学交流论坛里发过几篇连载文章。</p>
+                        <p>现在重新读来，那些文字真是稚嫩、做作得让人脸红。和黑川老师那如深渊般深邃的文笔比起来，我那点可笑的才华简直就像是下水道里的泥水，根本不值一提。赶紧把这些垃圾烧掉了吧。伊藤啊伊藤，你还是认清现实，踏踏实实做好助手的本职工作吧。</p>
+                    </div>
+                    <div class="post-footer">评论 (0) | 浏览 (15)</div>
+                </div>
+
+            </div>
+
+            <!-- 右侧：侧边栏 -->
+            <div class="sidebar">
+                <!-- 个人资料卡 -->
+                <div class="profile-widget">
+                    <div class="profile-title">Profile</div>
+                    <!-- 头像图片：廉价西装与拘谨的微笑 -->
+                    <img src="伊藤健司头像.png" alt="伊藤健司的头像" class="profile-avatar">
+                    <div class="profile-name">伊藤健司 (Ito Kenji)</div>
+                    <div class="profile-desc">
+                        著名推理巨匠黑川龙老师的专属助手。<br>
+                        日常负责资料搜集、原稿录入及家务协助。<br>
+                        座右铭：甘做伟大背后的阴影。
+                    </div>
+                </div>
+
+                <!-- 博客分类 -->
+                <div class="widget">
+                    <div class="widget-header">文章分类</div>
+                    <ul class="widget-list">
+                        <li>老师的日常 (142)</li>
+                        <li>书房整理记录 (85)</li>
+                        <li>杂感与自省 (23)</li>
+                    </ul>
+                </div>
+
+                <!-- 归档 -->
+                <div class="widget">
+                    <div class="widget-header">历史归档</div>
+                    <ul class="widget-list">
+                        <li>2026年 06月 (2)</li>
+                        <li>2026年 05月 (6)</li>
+                        <li>2026年 04月 (4)</li>
+                        <li>...查看更多</li>
+                    </ul>
+                </div>
+
+                <!-- 访问统计 -->
+                <div class="widget" style="text-align: center;">
+                    <div class="widget-header" style="text-align: left;">累计访问</div>
+                    <span class="hit-counter">0001402</span>
+                </div>
+            </div>
+        </div>
+    </div>
+
+</body>
+</html>

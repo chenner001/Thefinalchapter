@@ -1,0 +1,203 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>incineration</title>
+    <style>
+        /* ================= 基础重置与深渊背景 ================= */
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            overflow: hidden; /* 隐藏滚动条 */
+            background-color: #000000; /* 纯黑背景让火焰更醒目 */
+            /* 底部暗红光晕，模拟火坑底部的环境光 */
+            background: radial-gradient(circle at 50% 100%, #1a0000 0%, #000000 60%);
+        }
+
+        /* ================= 核心：正在燃烧的纸张底片 ================= */
+        .paper-container {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 5; /* 置于火焰画布的下方 */
+            pointer-events: none; /* 防止遮挡鼠标 */
+        }
+
+        .paper-container img {
+            width: 100%;
+            max-width: 950px; /* 限制图片最大宽度，保证文本清晰 */
+            
+            /* 【神级裁剪】使用 CSS 径向渐变遮罩，完美裁掉原图的灰色背景和方形边缘，使其自然消散在黑暗中 */
+            -webkit-mask-image: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,1) 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 75%);
+            mask-image: radial-gradient(ellipse at 50% 50%, rgba(0,0,0,1) 25%, rgba(0,0,0,0.5) 50%, rgba(0,0,0,0) 75%);
+            
+            /* 调用动画：火光映射与纸张升腾 */
+            animation: burnFlicker 2.5s infinite alternate ease-in-out, paperFloat 15s linear forwards;
+        }
+
+        /* 模拟火光在纸张表面忽明忽暗的闪烁感 */
+        @keyframes burnFlicker {
+            0% { 
+                /* 偏暗红、低对比度 */
+                filter: brightness(0.5) contrast(1.2) sepia(0.8) hue-rotate(-15deg); 
+            }
+            100% { 
+                /* 偏明黄、高对比度 */
+                filter: brightness(0.85) contrast(1.5) sepia(0.5) hue-rotate(-5deg); 
+            }
+        }
+
+        /* 模拟纸张在热气流中缓缓上升并放大的绝望感 */
+        @keyframes paperFloat {
+            0% { transform: scale(0.95) translateY(20px); }
+            100% { transform: scale(1.05) translateY(-30px); }
+        }
+
+        /* ================= 烈火画布 ================= */
+        canvas {
+            position: absolute;
+            top: 0;
+            left: 0;
+            display: block;
+            width: 100%;
+            height: 100%;
+            z-index: 10; /* 火焰覆盖在纸张之上 */
+            mix-blend-mode: screen; /* 增强火焰高光，使其穿透底片 */
+        }
+
+        /* ================= 全屏转场：渐渐变黑的遮罩层 ================= */
+        .fade-out-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            background-color: #000000;
+            z-index: 99999; /* 保证在火海和所有内容之上 */
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 3s ease-in-out; /* 3秒平滑陷入黑暗 */
+        }
+        
+        /* 激活黑屏 */
+        .fade-out-overlay.active {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body>
+
+    <div class="fade-out-overlay" id="fadeOverlay"></div>
+
+    <div class="paper-container">
+        <img src="261aca2f-fafa-481e-9210-c2c94146ccb2.png" alt="Burning Paper">
+    </div>
+
+    <canvas id="fireCanvas"></canvas>
+
+    <script>
+        const canvas = document.getElementById('fireCanvas');
+        const ctx = canvas.getContext('2d');
+        const fadeOverlay = document.getElementById('fadeOverlay');
+
+        // 设置画布尺寸为窗口大小
+        function resizeCanvas() {
+            canvas.width = window.innerWidth;
+            canvas.height = window.innerHeight;
+        }
+        window.addEventListener('resize', resizeCanvas);
+        resizeCanvas();
+
+        const particles = [];
+
+        // ================= 粒子类 (火苗) =================
+        class FireParticle {
+            constructor() {
+                this.x = (Math.random() * canvas.width * 1.2) - (canvas.width * 0.1);
+                this.y = canvas.height + Math.random() * 50;
+                this.size = Math.random() * 60 + 30; 
+                this.speedX = Math.random() * 2 - 1; 
+                this.speedY = Math.random() * -5 - 3; 
+                this.life = 1; 
+                this.decay = Math.random() * 0.015 + 0.008; 
+            }
+
+            update() {
+                this.speedX += (Math.random() - 0.5) * 0.3; 
+                this.x += this.speedX;
+                this.y += this.speedY;
+                this.size -= 0.4; 
+                if (this.size < 0) this.size = 0;
+                this.life -= this.decay;
+            }
+
+            draw() {
+                if (this.size <= 0 || this.life <= 0) return;
+
+                ctx.globalCompositeOperation = 'lighter';
+
+                let r = 255;
+                let g = Math.floor(255 * this.life); 
+                let b = Math.floor(100 * Math.pow(this.life, 3)); 
+                let alpha = this.life * 0.8; 
+
+                let gradient = ctx.createRadialGradient(this.x, this.y, 0, this.x, this.y, this.size);
+                gradient.addColorStop(0, `rgba(${r}, ${g}, ${b}, ${alpha})`);
+                gradient.addColorStop(0.4, `rgba(${r}, ${Math.max(0, g - 50)}, 0, ${alpha * 0.6})`);
+                gradient.addColorStop(1, `rgba(${r}, 0, 0, 0)`);
+
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+                ctx.fillStyle = gradient;
+                ctx.fill();
+            }
+        }
+
+        // ================= 动画主循环 =================
+        function animate() {
+            ctx.clearRect(0, 0, canvas.width, canvas.height);
+            
+            let particlesToSpawn = Math.floor(canvas.width / 80);
+            for (let i = 0; i < particlesToSpawn; i++) {
+                particles.push(new FireParticle());
+            }
+
+            for (let i = 0; i < particles.length; i++) {
+                particles[i].update();
+                particles[i].draw();
+
+                if (particles[i].life <= 0 || particles[i].size <= 0) {
+                    particles.splice(i, 1);
+                    i--;
+                }
+            }
+
+            requestAnimationFrame(animate);
+        }
+
+        // 启动焚烧动画
+        animate();
+
+        // ================= 递进式转场与跳转逻辑 =================
+        
+        // 1. 播放5秒后，启动全屏渐渐变黑的遮罩动画 (持续3秒)
+        setTimeout(() => {
+            fadeOverlay.classList.add('active');
+        }, 5000);
+
+        // 2. 再过3秒（总计第8秒），当屏幕完全陷入黑暗后，无缝跳转到次日发布会
+        setTimeout(() => {
+            window.location.href = 'pressconference.html';
+        }, 8000);
+        
+    </script>
+</body>
+</html>

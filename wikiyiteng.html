@@ -1,0 +1,228 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>伊藤健司 - Wikipedia，自由的文学指南</title>
+    <style>
+        /* ================= 基础重置 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #f6f6f6;
+            font-family: sans-serif;
+            color: #202122;
+            line-height: 1.6;
+        }
+
+        /* ================= 模拟浏览器顶栏 ================= */
+        .browser-header {
+            background: #e0e0e0;
+            padding: 10px 20px;
+            display: flex;
+            align-items: center;
+            border-bottom: 1px solid #ccc;
+        }
+        .browser-dots span {
+            display: inline-block;
+            width: 12px; height: 12px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+        .dot-red { background: #ff5f56; }
+        .dot-yellow { background: #ffbd2e; }
+        .dot-green { background: #27c93f; }
+        .browser-url {
+            margin-left: 20px;
+            background: #fff;
+            padding: 4px 15px;
+            border-radius: 4px;
+            font-size: 12px;
+            color: #666;
+            flex-grow: 1;
+            max-width: 500px;
+            font-family: monospace;
+        }
+
+        /* ================= 百科布局 ================= */
+        .wiki-header {
+            background: #ffffff;
+            border-bottom: 1px solid #a2a9b1;
+            padding: 15px 30px;
+            display: flex;
+            align-items: center;
+        }
+        .wiki-logo { font-size: 20px; font-weight: bold; font-family: serif; letter-spacing: 1px; color: #000; }
+        .wiki-search { margin-left: 50px; padding: 5px 10px; border: 1px solid #a2a9b1; border-radius: 2px; width: 300px; font-size: 14px; }
+        
+        .container {
+            display: flex;
+            max-width: 1200px;
+            margin: 0 auto;
+            background: #ffffff;
+            border: 1px solid #a2a9b1;
+            border-top: none;
+            min-height: 80vh;
+        }
+
+        /* 左侧导航栏 */
+        .sidebar {
+            width: 160px;
+            background: #f6f6f6;
+            padding: 20px 15px;
+            border-right: 1px solid #a2a9b1;
+            font-size: 13px;
+        }
+        .sidebar ul { list-style: none; margin-bottom: 20px; }
+        .sidebar li { margin-bottom: 8px; }
+        .sidebar a { color: #0645ad; text-decoration: none; }
+        .sidebar a:hover { text-decoration: underline; }
+
+        /* 主内容区 */
+        .main-content {
+            flex: 1;
+            padding: 30px 40px;
+        }
+        
+        h1 {
+            font-family: "Noto Serif SC", serif;
+            font-size: 32px;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 5px;
+            margin-bottom: 15px;
+            font-weight: normal;
+        }
+
+        /* 信息框 (Infobox) - 放在右侧 */
+        .infobox {
+            float: right;
+            width: 300px;
+            margin: 0 0 15px 25px;
+            border: 1px solid #a2a9b1;
+            background: #f8f9fa;
+            padding: 10px;
+            font-size: 13px;
+        }
+        .infobox-title {
+            text-align: center;
+            font-size: 16px;
+            font-weight: bold;
+            background: #eaf3ff;
+            padding: 5px;
+            margin-bottom: 10px;
+            border: 1px solid #a2a9b1;
+        }
+        .infobox img {
+            width: 100%;
+            height: auto;
+            border: 1px solid #ccc;
+            margin-bottom: 10px;
+        }
+        .infobox table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+        .infobox th {
+            text-align: left;
+            width: 35%;
+            padding: 5px;
+            vertical-align: top;
+        }
+        .infobox td {
+            padding: 5px;
+        }
+
+        /* 正文段落 */
+        p { margin-bottom: 15px; font-size: 15px; text-align: justify; }
+        a { color: #0645ad; text-decoration: none; }
+        a:hover { text-decoration: underline; }
+        
+        h2 {
+            font-family: sans-serif;
+            font-size: 22px;
+            border-bottom: 1px solid #a2a9b1;
+            padding-bottom: 3px;
+            margin: 30px 0 15px 0;
+            font-weight: normal;
+        }
+
+        /* 隐藏的线索提示区：当玩家强行框选或者悬停某些词时，暗示其心虚 */
+        .clue-text {
+            border-bottom: 1px dotted #888;
+            cursor: help;
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶层模拟浏览器 UI -->
+    <div class="browser-header">
+        <div class="browser-dots">
+            <span class="dot-red"></span>
+            <span class="dot-yellow"></span>
+            <span class="dot-green"></span>
+        </div>
+        <div class="browser-url">https://zh.wenhaiwiki.org/wiki/伊藤健司</div>
+    </div>
+
+    <!-- 百科顶部导航 -->
+    <div class="wiki-header">
+        <div class="wiki-logo">Wikipedia</div>
+        <input type="text" class="wiki-search" value="伊藤健司" readonly>
+    </div>
+
+    <div class="container">
+        <!-- 左侧边栏 -->
+        <div class="sidebar">
+            <ul>
+                <li><a href="#">首页</a></li>
+                <li><a href="#">分类索引</a></li>
+                <li><a href="#">特色条目</a></li>
+                <li><a href="#">随机条目</a></li>
+            </ul>
+            <ul>
+                <li><strong>帮助与关于</strong></li>
+                <li><a href="#">百科指南</a></li>
+                <li><a href="#">免责声明</a></li>
+            </ul>
+        </div>
+
+        <!-- 主内容区 -->
+        <div class="main-content">
+            <h1>伊藤健司</h1>
+            
+            <!-- 右侧人物信息框 -->
+            <div class="infobox">
+                <div class="infobox-title">伊藤健司</div>
+                <!-- 相对路径引用图片 -->
+                <img src="伊藤健司.png" alt="伊藤健司在早年签售会上的照片">
+                <table>
+                    <tr><th>本名</th><td>伊藤健司 (Ito Kenji)</td></tr>
+                    <tr><th>出生</th><td>1988年8月12日（38岁）<br>日本，东京都</td></tr>
+                    <tr><th>职业</th><td>推理小说家、作家助手</td></tr>
+                    <tr><th>曾用笔名</th><td>无名之羽</td></tr>
+                    <tr><th>恩师</th><td><a href="#">黑川龙</a></td></tr>
+                    <tr><th>代表作</th><td>《折翼之鸟》(19岁出道作)</td></tr>
+                    <tr><th>活跃时期</th><td>2010年 - 至今</td></tr>
+                </table>
+            </div>
+
+            <!-- 正文介绍 -->
+            <p><strong>伊藤健司</strong>（日语：伊藤 健司／いとう けんじ<sup> <em>Ito Kenji</em></sup>，1988年08月12日－），日本青年推理小说家。目前主要身份为日本国民级文学泰斗<a href="#">黑川龙</a>的首席专属助手。其文风细腻，尤其擅长心理侧写与密室诡计的构建。</p>
+
+            <h2>生平与经历</h2>
+            <p>伊藤健司在大学时期便展现出卓越的文学天赋。16岁时，他发表了短篇推理小说《折翼之鸟》，并获得了当年的新人赏提名。评委曾评价其“具有罕见的逻辑构建力，假以时日必成大器”。</p>
+            
+            <p>然而，自2007年起（即黑川龙发表《暗夜杀机》后的休笔期左右），伊藤健司出人意料地停止了个人独立作品的发表</span>，正式拜入黑川龙门下，成为其全职助手。</p>
+
+            <h2>助手生涯</h2>
+            <p>在担任黑川龙助手的近二十年间，伊藤健司极少在公众面前以独立作家的身份露面。据光文社编辑透露，伊藤不仅负责整理黑川老师的初期手稿和资料收集，甚至深度参与了黑川家的日常事务管理</span>，是黑川宅邸的常客，与黑川家族关系极为密切。</p>
+            
+            <p>业界普遍认为，黑川龙晚期作品中那些更为细腻、年轻化的文笔，与伊藤健司作为助手的“润色”密不可分。尽管外界对其“放弃天才之路，甘做大树底下的绿叶”感到惋惜，但伊藤本人多次在公开场合表示：“能为黑川老师磨墨，是我此生最大的荣幸。”</p>
+
+            <h2>争议与轶事</h2>
+            <p>近年来，一些文学评论家在对黑川龙近十年的畅销著作进行“文体语言学测算”时指出，这些作品的断句习惯与词汇偏好，与伊藤健司早年的成名作《折翼之鸟》有惊人的重合度。这一现象曾引发小范围的<a href="#">“代笔疑云”</a>讨论，但均被黑川龙的经纪团队以及伊藤健司本人严厉驳斥。</p>
+        </div>
+    </div>
+
+</body>
+</html>
