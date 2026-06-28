@@ -117,23 +117,46 @@
             0% { transform: translateY(0); }
             100% { transform: translateY(calc(-100% - 50vh)); } /* 滚动到最顶部并消失 */
         }
+
+        /* ================= 隐藏的二周目彩蛋按钮 ================= */
+        #secret-container {
+            position: absolute; inset: 0;
+            display: flex; justify-content: center; align-items: center;
+            z-index: 100;
+            opacity: 0;
+            pointer-events: none; /* 出现前禁止点击 */
+            transition: opacity 5s ease; /* 5秒极其缓慢的幽灵般浮现 */
+        }
+        #secret-container.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .secret-btn {
+            font-size: 15px;
+            letter-spacing: 6px;
+            color: #444; /* 初始非常黯淡 */
+            cursor: pointer;
+            padding: 15px 30px;
+            border: 1px solid transparent;
+            transition: all 1s ease;
+        }
+        .secret-btn:hover {
+            color: #aa0000; /* 悬停时透出鲜血般的暗红预警 */
+            text-shadow: 0 0 15px rgba(170, 0, 0, 0.8);
+            border-color: rgba(170, 0, 0, 0.3);
+        }
     </style>
 </head>
 <body>
 
-    <!-- 背景音频：请替换 src 属性为你自己的音乐文件 -->
-    <!-- 推荐使用空灵钢琴单音+风声潮汐声的无损音轨 -->
     <audio id="bgmAudio" src="bgm.mp3" loop preload="auto"></audio>
 
-    <!-- 极细微的尘埃粒子背景 -->
     <canvas id="dustCanvas"></canvas>
 
-    <!-- 启动屏：绕过浏览器音频限制 -->
     <div id="start-screen">
         <div class="start-btn" id="startBtn">翻开最后一页</div>
     </div>
 
-    <!-- 滚动的长文字 -->
     <div class="credits-wrapper" id="creditsWrapper">
         <div class="credits-content" id="creditsContent">
             
@@ -198,6 +221,10 @@
         </div>
     </div>
 
+    <div id="secret-container">
+        <div class="secret-btn" onclick="window.location.href='screenchoice.html'">【 翻开《虚妄之冕》的废稿 】</div>
+    </div>
+
     <script>
         // ================= 页面交互逻辑 =================
         const startBtn = document.getElementById('startBtn');
@@ -206,11 +233,12 @@
         const dustCanvas = document.getElementById('dustCanvas');
         const creditsWrapper = document.getElementById('creditsWrapper');
         const creditsContent = document.getElementById('creditsContent');
+        const secretContainer = document.getElementById('secret-container');
 
         startBtn.addEventListener('click', () => {
-            // 播放音乐 (建议替换为一个真实的 mp3 链接)
+            // 播放音乐
             bgm.volume = 0.5; 
-            bgm.play().catch(e => console.log("请确保配置了真实的 bgm.mp3 文件"));
+            bgm.play().catch(e => console.log("音频未找到或被拦截"));
 
             // 隐藏启动屏幕
             startScreen.style.opacity = '0';
@@ -225,9 +253,18 @@
             // 启动字幕滚动动画
             setTimeout(() => {
                 creditsContent.classList.add('scroll-animation');
-            }, 1500); // 留出一点环境音预热的时间
+            }, 1500); 
         });
 
+        // ================= 终极彩蛋监听器 =================
+        // 监听滚动动画彻底结束（70秒后）
+        creditsContent.addEventListener('animationend', () => {
+            // 动画结束后，再静默等待 30 秒 (30000毫秒)
+            setTimeout(() => {
+                // 30秒后，缓慢浮现通往 Bad End 的入口
+                secretContainer.classList.add('show');
+            }, 30000); 
+        });
 
         // ================= 微光尘埃粒子引擎 =================
         const ctx = dustCanvas.getContext('2d');
@@ -244,20 +281,18 @@
             constructor() {
                 this.x = Math.random() * dustCanvas.width;
                 this.y = Math.random() * dustCanvas.height;
-                this.size = Math.random() * 1.5 + 0.2; // 极小的微尘
-                this.speedX = (Math.random() - 0.5) * 0.3; // 极其缓慢的水平漂浮
-                this.speedY = Math.random() * -0.5 - 0.1;  // 极其缓慢的上升
-                this.alpha = Math.random() * 0.5 + 0.1; // 半透明
+                this.size = Math.random() * 1.5 + 0.2; 
+                this.speedX = (Math.random() - 0.5) * 0.3; 
+                this.speedY = Math.random() * -0.5 - 0.1;  
+                this.alpha = Math.random() * 0.5 + 0.1; 
             }
             update() {
                 this.x += this.speedX;
                 this.y += this.speedY;
 
-                // 模拟呼吸感的透明度变化
                 if (Math.random() > 0.98) this.alpha += (Math.random() - 0.5) * 0.1;
                 this.alpha = Math.max(0.1, Math.min(0.6, this.alpha));
 
-                // 飞出屏幕后从底部重新生成
                 if (this.y < 0) {
                     this.y = dustCanvas.height;
                     this.x = Math.random() * dustCanvas.width;
@@ -271,7 +306,6 @@
             }
         }
 
-        // 初始化粒子
         for (let i = 0; i < 150; i++) {
             dustArray.push(new Dust());
         }
