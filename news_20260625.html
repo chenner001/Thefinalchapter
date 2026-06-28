@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>【速報】黑川家令嬢に精神疾患の疑い - JP News</title>
+    <style>
+        /* ================= 基础重置与新闻页面排版 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body {
+            background-color: #f6f6f8;
+            font-family: "Hiragino Sans", "Meiryo", "Noto Sans CJK SC", "Microsoft YaHei", sans-serif;
+            color: #333;
+            overflow-x: hidden;
+        }
+
+        /* 顶部导航栏 (模拟日本新闻门户) */
+        .news-header {
+            background-color: #ff0033;
+            color: white;
+            padding: 12px 20px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            position: fixed;
+            top: 0; left: 0; right: 0;
+            z-index: 100;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        }
+        .news-logo { font-size: 22px; font-weight: bold; font-style: italic; letter-spacing: 1px; }
+        .news-nav { display: flex; gap: 15px; font-size: 14px; font-weight: bold; }
+        
+        .sub-nav {
+            margin-top: 52px;
+            background-color: #ffffff;
+            border-bottom: 1px solid #ddd;
+            padding: 10px 20px;
+            display: flex;
+            gap: 20px;
+            font-size: 13px;
+            color: #666;
+            overflow-x: auto;
+        }
+        .sub-nav span:first-child { color: #ff0033; font-weight: bold; border-bottom: 2px solid #ff0033; padding-bottom: 8px; }
+
+        /* 新闻正文区 */
+        .article-container {
+            max-width: 800px;
+            margin: 30px auto 100px;
+            background-color: #ffffff;
+            padding: 40px;
+            border: 1px solid #e5e5e5;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.03);
+            border-radius: 4px;
+            position: relative;
+        }
+
+        .breadcrumb { font-size: 12px; color: #888; margin-bottom: 20px; }
+        
+        .article-title {
+            font-size: 26px;
+            line-height: 1.5;
+            font-weight: bold;
+            color: #111;
+            margin-bottom: 15px;
+        }
+
+        .article-meta {
+            display: flex;
+            justify-content: space-between;
+            font-size: 13px;
+            color: #666;
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 25px;
+        }
+        .source { color: #0055cc; font-weight: bold; cursor: pointer; }
+
+        .article-body p {
+            font-size: 16px;
+            line-height: 2;
+            margin-bottom: 20px;
+            color: #222;
+            text-align: justify;
+        }
+        
+        /* 突出显示的引言 */
+        .quote-block {
+            border-left: 4px solid #cc0000;
+            background-color: #fafafa;
+            padding: 15px 20px;
+            margin: 25px 0;
+            font-weight: bold;
+            color: #444;
+        }
+
+        .image-placeholder {
+            width: 100%;
+            height: 300px;
+            background-color: #ececec;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            color: #999;
+            font-size: 14px;
+            margin-bottom: 25px;
+            border: 1px solid #ddd;
+        }
+
+        /* ================= 绝望深渊：暗角吞噬动画 ================= */
+        .darkness-overlay {
+            position: fixed;
+            top: 0; left: 0;
+            width: 100vw; height: 100vh;
+            pointer-events: none; /* 不影响玩家原本试图滑动页面的操作 */
+            z-index: 9999;
+            /* 初始状态：透明，完全没有阴影 */
+            box-shadow: inset 0 0 0vmax rgba(0, 0, 0, 1);
+            background-color: rgba(0, 0, 0, 0);
+            
+            /* 延迟 20 秒执行，持续 10 秒，保留最后状态 */
+            animation: creepingDarkness 10s cubic-bezier(0.4, 0, 0.2, 1) 20s forwards;
+        }
+
+        @keyframes creepingDarkness {
+            0% {
+                box-shadow: inset 0 0 0vmax rgba(0, 0, 0, 1);
+                background-color: rgba(0, 0, 0, 0);
+            }
+            60% {
+                /* 阴影从四周极速向中心压迫 */
+                box-shadow: inset 0 0 60vmax rgba(0, 0, 0, 1);
+                background-color: rgba(0, 0, 0, 0.2);
+            }
+            100% {
+                /* 彻底填满屏幕，背景变黑 */
+                box-shadow: inset 0 0 100vmax rgba(0, 0, 0, 1);
+                background-color: rgba(0, 0, 0, 1);
+            }
+        }
+    </style>
+</head>
+<body>
+
+    <!-- 顶部模拟 UI -->
+    <div class="news-header">
+        <div class="news-logo">JAPAN NEWS NETWORK</div>
+        <div class="news-nav">
+            <span>トップ</span>
+            <span>主要</span>
+            <span>国内</span>
+            <span>エンタメ</span>
+            <span>社会</span>
+        </div>
+    </div>
+    <div class="sub-nav">
+        <span>最新ニュース</span>
+        <span>事件・事故</span>
+        <span>政治</span>
+        <span>IT・ネット</span>
+    </div>
+
+    <!-- 假新闻正文 -->
+    <div class="article-container">
+        <div class="breadcrumb">トップ &gt; 国内 &gt; 社会事件 &gt; 記事詳細</div>
+        
+        <h1 class="article-title">【速报】已故作家黑川龙之女确诊精神重症，前主编伊藤健司将全面接管其家族资产及版权</h1>
+        
+        <div class="article-meta">
+            <span><span class="source">東京新聞デジタル</span> (2026/6/25 14:30 配信)</span>
+            <span>💬 コメント 12,408件</span>
+        </div>
+
+        <div class="image-placeholder">
+            [ 现场照片：伊藤健司在新闻发布会上展示精神鉴定报告 ]
+        </div>
+
+        <div class="article-body">
+            <p><strong>6月25日 综合报道</strong> —— 警视厅及多家媒体今日证实，近期在网络上频繁散播所谓“光文社阴谋论”的黑川雪（18岁，系已故著名推理小说家黑川龙之独女），已被确诊患有严重的“偏执妄想型精神分裂症”。目前，当事人已被网络安全部门实施反向定位，并由警方护送至东京都立精神卫生中心接受强制隔离治疗。</p>
+            
+            <p>昨夜，光文社现任社长兼总编辑伊藤健司召开紧急新闻发布会。会上，伊藤面对闪光灯显得神情沉重，他公开展示了由权威医疗机构出具的黑川雪精神鉴定报告，并对近日网络上的风波做出了最终澄清。</p>
+
+            <div class="quote-block">
+                “雪是一直被我们当做亲生女儿看待的孩子。看到她因为无法接受父亲的离世，最终陷入这种被迫害妄想与严重的精神错乱中，我感到无比痛心。她甚至利用非法黑客手段攻击光文社的服务器，试图篡改父亲遗留的心血，这是病态的失控。” —— 伊藤健司
+            </div>
+
+            <p>根据东京家庭裁判所的最新紧急裁定，鉴于黑川雪目前的精神状态已完全丧失民事行为能力，且其生母无力承担监护责任，法院已正式指定伊藤健司作为其临时法定监护人及财产代管人。</p>
+
+            <p>即日起，黑川家族名下的所有固定资产、光文社股份，以及已故巨匠黑川龙的全量作品版权、海外影视改编权及未公开手稿，均由伊藤健司及其主导的信托团队全面接管。</p>
+
+            <p>警视厅网络犯罪对策课也于今日发表声明称，黑川雪此前试图入侵光文社内网的非法终端已被成功反追踪并物理缴获。所有被其散布的“虚假凭证”均已被证实为精神错乱状态下的伪造物，相关网络痕迹正在被依法抹除。</p>
+
+            <p>“黑川老师的遗作绝不能被一个精神病患毁掉。”发布会最后，伊藤健司深深鞠躬，“光文社会替他守护这一切，直到永远。”</p>
+        </div>
+    </div>
+
+    <!-- 极度压抑的暗角吞噬动画层 -->
+    <div class="darkness-overlay"></div>
+
+    <script>
+        /**
+         * [BAD END SEQUENCE TRIGGER]
+         * 倒计时 30 秒（20秒阅读 + 10秒渐渐黑屏）后强制跳转至 badend.html
+         */
+        window.onload = function() {
+            // 20000ms (20s) 后动画开始
+            // 10000ms (10s) 动画持续
+            // 总计 30000ms 后执行页面跳转
+            setTimeout(function() {
+                window.location.href = 'badnews.html';
+            }, 30000); 
+        };
+    </script>
+</body>
+</html>

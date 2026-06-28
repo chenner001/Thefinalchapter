@@ -1,0 +1,171 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>CRITICAL WARNING - SYSTEM OVERRIDE</title>
+    <style>
+        /* ================= 基础重置与系统背景 ================= */
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        body, html {
+            width: 100%; height: 100%;
+            background-color: #050505;
+            color: #fff;
+            font-family: "Courier New", Courier, "Noto Serif CJK SC", monospace, serif;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            /* 移除了 cursor: pointer，暗示玩家无能为力 */
+        }
+
+        /* ================= 刺眼的暗红警报边框 ================= */
+        .alert-overlay {
+            position: fixed; inset: 0;
+            border: 8px solid rgba(153, 0, 0, 0.8);
+            box-shadow: inset 0 0 150px rgba(153, 0, 0, 0.4);
+            animation: pulseAlert 0.4s infinite alternate;
+            pointer-events: none;
+            z-index: 1;
+        }
+        @keyframes pulseAlert {
+            0% { opacity: 0.6; box-shadow: inset 0 0 80px rgba(153, 0, 0, 0.3); }
+            100% { opacity: 1; box-shadow: inset 0 0 200px rgba(153, 0, 0, 0.8); }
+        }
+
+        /* 屏幕扫描线特效 */
+        .scanlines {
+            position: fixed; inset: 0;
+            background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.25) 50%), linear-gradient(90deg, rgba(255, 0, 0, 0.06), rgba(0, 255, 0, 0.02), rgba(0, 0, 255, 0.06));
+            background-size: 100% 4px, 3px 100%;
+            pointer-events: none; z-index: 2;
+        }
+
+        /* ================= 居中警告与进度条 ================= */
+        .warning-container {
+            width: 90%; max-width: 1400px;
+            text-align: center; z-index: 10;
+            /* 制造极度压迫感的剧烈抖动 */
+            animation: aggressiveShake 0.1s infinite;
+        }
+        
+        /* 剧烈抖动关键帧 */
+        @keyframes aggressiveShake {
+            0% { transform: translate(2px, 1px) rotate(0deg); }
+            10% { transform: translate(-1px, -2px) rotate(-1deg); }
+            20% { transform: translate(-3px, 0px) rotate(1deg); }
+            30% { transform: translate(0px, 2px) rotate(0deg); }
+            40% { transform: translate(1px, -1px) rotate(1deg); }
+            50% { transform: translate(-1px, 2px) rotate(-1deg); }
+            60% { transform: translate(-3px, 1px) rotate(0deg); }
+            70% { transform: translate(2px, 1px) rotate(-1deg); }
+            80% { transform: translate(-1px, -1px) rotate(1deg); }
+            90% { transform: translate(2px, 2px) rotate(0deg); }
+            100% { transform: translate(1px, -2px) rotate(-1deg); }
+        }
+
+        .warning-text {
+            color: #990000;
+            font-family: "Times New Roman", "SimSun", "STSong", serif; 
+            font-size: 2.5vw; 
+            font-weight: 900;
+            letter-spacing: 3px;
+            text-shadow: 0 0 10px rgba(153, 0, 0, 0.8), 0 0 25px rgba(102, 0, 0, 0.6);
+            /* 文字内部叠加错乱闪烁 */
+            animation: textFlicker 0.15s infinite alternate;
+        }
+
+        @keyframes textFlicker {
+            0% { opacity: 1; }
+            100% { opacity: 0.8; }
+        }
+
+        /* 进度条外框与内芯 */
+        .progress-box {
+            width: 100%; height: 35px; /* 加粗进度条增加视觉冲击力 */
+            border: 3px solid #990000;
+            margin-top: 30px;
+            padding: 4px;
+            background: rgba(153, 0, 0, 0.15);
+            position: relative;
+        }
+        .progress-bar {
+            height: 100%;
+            background-color: #990000;
+            width: 78%; 
+            box-shadow: 0 0 25px #990000;
+        }
+        .progress-detail {
+            color: #990000;
+            font-size: 20px;
+            margin-top: 15px;
+            text-align: right;
+            font-weight: bold;
+            letter-spacing: 2px;
+            text-shadow: 0 0 5px rgba(153,0,0,0.5);
+        }
+    </style>
+</head>
+<body>
+
+    <div class="alert-overlay"></div>
+    <div class="scanlines"></div>
+
+    <div class="warning-container">
+        <div class="warning-text" id="warnText">[警告：检测到反向跟踪] WARNING: REVERSE TRACE DETECTED (78.00%)</div>
+        <div class="progress-box">
+            <div class="progress-bar" id="progressBar"></div>
+        </div>
+        <div class="progress-detail">ESTIMATED TRACE TIME: <span id="timeLeft">00:08:42</span></div>
+    </div>
+
+    <script>
+        let percent = 78.00;
+        let timeRemaining = 842; 
+
+        const warnText = document.getElementById('warnText');
+        const progressBar = document.getElementById('progressBar');
+        const timeLeft = document.getElementById('timeLeft');
+
+        // ================= 进度条狂暴加载 (无法打断) =================
+        const interval = setInterval(() => {
+            if (percent < 100) {
+                let jump = Math.random() * 0.4 + 0.15; // 进度条跳动幅度
+                percent += jump;
+                
+                if (percent >= 100) {
+                    percent = 100.00;
+                    
+                    // 100% 时同步加入致命警告
+                    warnText.innerText = "[致命：物理地址已锁定] CRITICAL: PHYSICAL ADDRESS LOCKED (100.00%)";
+                    progressBar.style.width = `100%`;
+                    timeLeft.innerText = "00:00:00";
+                    clearInterval(interval);
+                    
+                    // 短暂定格 0.5 秒让玩家体会无路可逃的绝望，随后自动跳转到被抓结局
+                    setTimeout(() => {
+                        window.location.href = 'news_20260625.html';
+                    }, 500);
+                    return;
+                }
+
+                // 正常更新进度文本与进度条
+                warnText.innerText = `[警告：检测到反向跟踪] WARNING: REVERSE TRACE DETECTED (${percent.toFixed(2)}%)`;
+                progressBar.style.width = `${percent}%`;
+            }
+
+            // 倒计时乱码狂跳
+            if (timeRemaining > 0 && percent < 100) {
+                timeRemaining -= Math.floor(Math.random() * 18 + 5);
+                if (timeRemaining < 0) timeRemaining = 0;
+                
+                let seconds = Math.floor(timeRemaining / 100);
+                let ms = timeRemaining % 100;
+                timeLeft.innerText = `00:0${seconds}:${ms < 10 ? '0'+ms : ms}`;
+            }
+
+        }, 80);
+    </script>
+</body>
+</html>
