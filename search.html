@@ -339,7 +339,7 @@
         /**
          * [SECURE NETWORK SCRIPT]
          * System: Kurokawa Terminal
-         * Encryption: Base64 + Storage Lock
+         * Encryption: Base64 (Keys & Values) + Storage Lock
          */
         function executeSearch() {
             var _0xInput = document.getElementById('searchInput');
@@ -377,18 +377,18 @@
                 return; // 终止执行，不进入下方搜索逻辑
             }
 
-            // 5. 字典加密：若已解锁，执行正常搜索匹配
+            // 5. 字典双重加密：词条与网页链接均为 Base64
             var _0xDict = {
-                'JUU5JUJCJTkxJUU1JUI3JTlEJUU5JUJFJTk5': 'search_kurokawa.html', 
-                'JUU0JUJDJThBJUU4JTk3JUE0JUU1JTgxJUE1JUU1JThGJUI4': 'search_yiteng.html', 
-                'JUU2JThBJTk4JUU3JUJGJUJDJUU0JUI5JThCJUU5JUI4JTlG': 'search_bird.html', 
-                'JUU2JTk3JUEwJUU1JTkwJThEJUU0JUI5JThCJUU3JUJFJUJE': 'search_feather.html', 
-                'JUU3JTk2JTkxJUU4JUJEJUE4': 'search_books.html', 
-                'JUU3JUJEJUFBJUU2JTgxJUI2JUU0JUI5JThCJUU4JThBJUIx': 'search_books.html', 
-                'JUU1JTg1JTg5JUU2JTk2JTg3JUU3JUE0JUJF': 'search_kobunsha.html', 
-                'JUU5JUJCJTkxJUU3JTk5JUJFJUU1JTkwJTg4JUU4JThBJUIxJUU4JTg5JUJB': 'search_blacklily.html', 
-                'JUU1JUFFJUFCJUU1JUI0JThFJUU1JUFFJTg5JUU1JUE1JTg4': 'search_anna.html', 
-                'JUU5JUJCJTkxJUU1JUI3JTlEJUU4JTkxJUI1': 'search_aoi.html' 
+                'JUU5JUJCJTkxJUU1JUI3JTlEJUU5JUJFJTk5': 'c2VhcmNoX2t1cm9rYXdhLmh0bWw=', 
+                'JUU0JUJDJThBJUU4JTk3JUE0JUU1JTgxJUE1JUU1JThGJUI4': 'c2VhcmNoX3lpdGVuZy5odG1s', 
+                'JUU2JThBJTk4JUU3JUJGJUJDJUU0JUI5JThCJUU5JUI4JTlG': 'c2VhcmNoX2JpcmQuaHRtbA==', 
+                'JUU2JTk3JUEwJUU1JTkwJThEJUU0JUI5JThCJUU3JUJFJUJE': 'c2VhcmNoX2ZlYXRoZXIuaHRtbA==', 
+                'JUU3JTk2JTkxJUU4JUJEJUE4': 'c2VhcmNoX2Jvb2tzLmh0bWw=', 
+                'JUU3JUJEJUFBJUU2JTgxJUI2JUU0JUI5JThCJUU4JThBJUIx': 'c2VhcmNoX2Jvb2tzLmh0bWw=', 
+                'JUU1JTg1JTg5JUU2JTk2JTg3JUU3JUE0JUJF': 'c2VhcmNoX2tvYnVuc2hhLmh0bWw=', 
+                'JUU5JUJCJTkxJUU3JTk5JUJFJUU1JTkwJTg4JUU4JThBJUIxJUU4JTg5JUJB': 'c2VhcmNoX2JsYWNrbGlseS5odG1s', 
+                'JUU1JUFFJUFCJUU1JUI0JThFJUU1JUFFJTg5JUU1JUE1JTg4': 'c2VhcmNoX2FubmEuaHRtbA==', 
+                'JUU5JUJCJTkxJUU1JUI3JTlEJUU4JTkxJUI1': 'c2VhcmNoX2FvaS5odG1s' 
             };
 
             var _0xMatch = false;
@@ -397,7 +397,10 @@
                 try {
                     var _0xDecoded = decodeURIComponent(atob(_0xKey));
                     if (_0xQuery.indexOf(_0xDecoded) !== -1) {
-                        window.open(_0xDict[_0xKey], '_blank'); 
+                        // 【核心改动】：利用 atob 对目标链接进行解密后再打开
+                        var _0xTargetUrl = atob(_0xDict[_0xKey]);
+                        window.open(_0xTargetUrl, '_blank'); 
+                        
                         _0xMatch = true;
                         _0xError.style.display = 'none'; // 匹配成功隐藏报错
                         break;
