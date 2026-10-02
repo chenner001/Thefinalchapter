@@ -10,7 +10,7 @@
         body, html {
             width: 100%; height: 100%;
             background-color: #000000;
-            overflow: hidden; /* 禁止手动滚动，纯享动画 */
+            overflow: hidden; /* 默认禁止手动滚动 */
             font-family: "Noto Serif CJK SC", "Songti SC", "Times New Roman", serif;
             color: rgba(255, 255, 255, 0.8);
         }
@@ -54,23 +54,22 @@
             position: absolute; inset: 0;
             z-index: 10;
             display: flex; justify-content: center;
-            /* 核心：使用遮罩让文字在屏幕顶部和底部自然淡入淡出 */
             -webkit-mask-image: linear-gradient(to bottom, transparent 5%, #000 20%, #000 80%, transparent 95%);
             mask-image: linear-gradient(to bottom, transparent 5%, #000 20%, #000 80%, transparent 95%);
             opacity: 0;
-            transition: opacity 3s ease 1s; /* 启动后延迟1秒慢慢浮现 */
+            transition: opacity 3s ease 1s; 
         }
 
         .credits-content {
             width: 80%; max-width: 700px;
             position: absolute;
-            top: 100%; /* 初始位置在屏幕最下方之外 */
+            top: 100%; 
             text-align: justify;
             text-justify: inter-ideograph;
             line-height: 2.5;
             font-size: 18px;
             letter-spacing: 2px;
-            padding-bottom: 50vh; /* 确保最后一行能在屏幕中央停留 */
+            padding-bottom: 50vh; 
         }
 
         /* 文字排版细节 */
@@ -108,14 +107,14 @@
             text-shadow: 0 0 20px rgba(255,255,255,0.6);
         }
 
-        /* 滚动动画类：控制总时长 (70秒) */
+        /* 滚动动画类 */
         .scroll-animation {
             animation: scrollUp 70s linear forwards;
         }
 
         @keyframes scrollUp {
             0% { transform: translateY(0); }
-            100% { transform: translateY(calc(-100% - 50vh)); } /* 滚动到最顶部并消失 */
+            100% { transform: translateY(calc(-100% - 50vh)); } 
         }
 
         /* ================= 隐藏的二周目彩蛋按钮 ================= */
@@ -124,8 +123,8 @@
             display: flex; justify-content: center; align-items: center;
             z-index: 100;
             opacity: 0;
-            pointer-events: none; /* 出现前禁止点击 */
-            transition: opacity 5s ease; /* 5秒极其缓慢的幽灵般浮现 */
+            pointer-events: none; 
+            transition: opacity 5s ease; 
         }
         #secret-container.show {
             opacity: 1;
@@ -134,16 +133,78 @@
         .secret-btn {
             font-size: 15px;
             letter-spacing: 6px;
-            color: #444; /* 初始非常黯淡 */
+            color: #444; 
             cursor: pointer;
             padding: 15px 30px;
             border: 1px solid transparent;
             transition: all 1s ease;
         }
         .secret-btn:hover {
-            color: #aa0000; /* 悬停时透出鲜血般的暗红预警 */
+            color: #aa0000; 
             text-shadow: 0 0 15px rgba(170, 0, 0, 0.8);
             border-color: rgba(170, 0, 0, 0.3);
+        }
+
+        /* ================= 新增：跳过按钮与阅读模式 ================= */
+        #skipBtn {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            z-index: 100;
+            font-size: 14px;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.8s ease;
+        }
+        #skipBtn.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #skipBtn:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* 跳过后的自由滚动状态 */
+        .credits-wrapper.skipped-mode {
+            overflow-y: auto;
+            align-items: flex-start;
+            /* 移除遮罩，使文字全局清晰可见 */
+            -webkit-mask-image: none;
+            mask-image: none;
+        }
+        
+        /* 美化滚动条 */
+        .credits-wrapper.skipped-mode::-webkit-scrollbar {
+            width: 5px;
+        }
+        .credits-wrapper.skipped-mode::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        .credits-content.skipped-mode {
+            position: relative;
+            top: 0;
+            margin-top: 15vh;
+            padding-bottom: 20vh;
+            /* 强制终止动画 */
+            animation: none !important; 
+            transform: translateY(0) !important;
+        }
+
+        /* 跳过模式下的彩蛋按钮布局 */
+        #secret-container.inline-mode {
+            position: relative;
+            inset: auto;
+            margin-top: 80px;
+            transition: opacity 3s ease; /* 跳过模式下出现得稍微快一点 */
         }
     </style>
 </head>
@@ -156,6 +217,9 @@
     <div id="start-screen">
         <div class="start-btn" id="startBtn">翻开最后一页</div>
     </div>
+
+    <!-- 新增的跳过按钮 -->
+    <div id="skipBtn">SKIP</div>
 
     <div class="credits-wrapper" id="creditsWrapper">
         <div class="credits-content" id="creditsContent">
@@ -222,7 +286,7 @@
     </div>
 
     <div id="secret-container">
-        <div class="secret-btn" onclick="window.location.href='screenchoice.html'">【 翻开《虚妄之冕》的废稿 】</div>
+        <div class="secret-btn" onclick="window.location.href='screenchoice.html'"> 翻开《虚妄之冕》的废稿 </div>
     </div>
 
     <script>
@@ -234,6 +298,9 @@
         const creditsWrapper = document.getElementById('creditsWrapper');
         const creditsContent = document.getElementById('creditsContent');
         const secretContainer = document.getElementById('secret-container');
+        const skipBtn = document.getElementById('skipBtn');
+        
+        let secretTimeout; // 用于存储计时器
 
         startBtn.addEventListener('click', () => {
             // 播放音乐
@@ -254,14 +321,42 @@
             setTimeout(() => {
                 creditsContent.classList.add('scroll-animation');
             }, 1500); 
+
+            // 延迟出现 SKIP 按钮 (画面进入后再出现)
+            setTimeout(() => {
+                skipBtn.classList.add('show');
+            }, 3000);
         });
 
-        // ================= 终极彩蛋监听器 =================
-        // 监听滚动动画彻底结束（70秒后）
-        creditsContent.addEventListener('animationend', () => {
-            // 动画结束后，再静默等待 30 秒 (30000毫秒)
+        // ================= 跳过逻辑 =================
+        skipBtn.addEventListener('click', () => {
+            // 隐藏 Skip 按钮
+            skipBtn.classList.remove('show');
+            
+            // 切换为自由滚动阅读模式
+            creditsWrapper.classList.add('skipped-mode');
+            creditsContent.classList.add('skipped-mode');
+
+            // 停止尚未执行完的默认彩蛋定时器
+            clearTimeout(secretTimeout);
+
+            // 将彩蛋容器移动到文档流底部（追加到文本后面）
+            secretContainer.classList.add('inline-mode');
+            creditsContent.appendChild(secretContainer);
+
+            // 跳过模式下，延迟 1 秒直接浮现彩蛋入口
             setTimeout(() => {
-                // 30秒后，缓慢浮现通往 Bad End 的入口
+                secretContainer.classList.add('show');
+            }, 1000);
+        });
+
+        // ================= 终极彩蛋监听器 (未跳过时的常规逻辑) =================
+        creditsContent.addEventListener('animationend', () => {
+            // 如果用户乖乖看完了，隐藏 SKIP 按钮
+            skipBtn.classList.remove('show');
+            
+            // 动画结束后，再静默等待 30 秒 (30000毫秒)
+            secretTimeout = setTimeout(() => {
                 secretContainer.classList.add('show');
             }, 30000); 
         });
