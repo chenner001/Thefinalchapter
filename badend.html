@@ -127,6 +127,60 @@
             0% { transform: translateY(0); }
             100% { transform: translateY(calc(-100% - 50vh)); } /* 滚动到最顶部并消失 */
         }
+
+        /* ================= 新增：跳过按钮与阅读模式 ================= */
+        #skipBtn {
+            position: fixed;
+            top: 30px;
+            right: 40px;
+            z-index: 100;
+            font-size: 14px;
+            letter-spacing: 4px;
+            color: rgba(255, 255, 255, 0.3);
+            cursor: pointer;
+            padding: 10px 20px;
+            border: 1px solid transparent;
+            opacity: 0;
+            pointer-events: none;
+            transition: all 0.8s ease;
+        }
+        #skipBtn.show {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        #skipBtn:hover {
+            color: #fff;
+            border-color: rgba(255, 255, 255, 0.3);
+            background: rgba(255, 255, 255, 0.05);
+        }
+
+        /* 跳过后的自由滚动状态 */
+        .credits-wrapper.skipped-mode {
+            overflow-y: auto;
+            align-items: flex-start;
+            /* 移除遮罩，使文字全局清晰可见 */
+            -webkit-mask-image: none;
+            mask-image: none;
+        }
+        
+        /* 美化滚动条 */
+        .credits-wrapper.skipped-mode::-webkit-scrollbar {
+            width: 5px;
+        }
+        .credits-wrapper.skipped-mode::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+        }
+
+        .credits-content.skipped-mode {
+            position: relative;
+            top: 0;
+            margin-top: 15vh;
+            padding-bottom: 20vh;
+            /* 强制终止动画 */
+            animation: none !important; 
+            transform: translateY(0) !important;
+        }
     </style>
 </head>
 <body>
@@ -141,6 +195,9 @@
     <div id="start-screen">
         <div class="start-btn" id="startBtn">翻开最后一页</div>
     </div>
+
+    <!-- 新增的跳过按钮 -->
+    <div id="skipBtn">SKIP</div>
 
     <!-- 滚动的长文字 -->
     <div class="credits-wrapper" id="creditsWrapper">
@@ -214,6 +271,7 @@
         const dustCanvas = document.getElementById('dustCanvas');
         const creditsWrapper = document.getElementById('creditsWrapper');
         const creditsContent = document.getElementById('creditsContent');
+        const skipBtn = document.getElementById('skipBtn');
 
         startBtn.addEventListener('click', () => {
             // 播放音乐 (建议替换为一个真实的 mp3 链接)
@@ -234,8 +292,28 @@
             setTimeout(() => {
                 creditsContent.classList.add('scroll-animation');
             }, 1500); 
+
+            // 延迟出现 SKIP 按钮 (画面进入后再出现)
+            setTimeout(() => {
+                skipBtn.classList.add('show');
+            }, 3000);
         });
 
+        // ================= 跳过逻辑 =================
+        skipBtn.addEventListener('click', () => {
+            // 隐藏 Skip 按钮
+            skipBtn.classList.remove('show');
+            
+            // 切换为自由滚动阅读模式
+            creditsWrapper.classList.add('skipped-mode');
+            creditsContent.classList.add('skipped-mode');
+        });
+
+        // ================= 正常结束监听器 =================
+        creditsContent.addEventListener('animationend', () => {
+            // 如果用户看完了完整动画，隐藏 SKIP 按钮
+            skipBtn.classList.remove('show');
+        });
 
         // ================= 微光尘埃粒子引擎 =================
         const ctx = dustCanvas.getContext('2d');
